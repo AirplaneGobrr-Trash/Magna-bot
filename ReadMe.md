@@ -2,10 +2,10 @@
 
 # Plans
 
-- [] Gobal ecom
-    - [] Shop
-    - [] Working
+- [ ] Gobal ecom
+    - [ ] Shop
+    - [ ] Working
 
-- [] Server ecom
-    - [] Shop
-    - [] Working
+- [ ] Server ecom
+    - [ ] Shop
+    - [ ] Working
