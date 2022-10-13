@@ -5,7 +5,8 @@ async function start() {
     const eventEmitter = global.stuff.eventEmitter
     //client with intents
     const client = new Client({
-        partials: ['MESSAGE', 'CHANNEL', 'REACTION'], intents: [
+        partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
+        intents: [
             Intents.FLAGS.GUILDS,
             Intents.FLAGS.GUILD_MESSAGES,
             Intents.FLAGS.GUILD_INVITES,
