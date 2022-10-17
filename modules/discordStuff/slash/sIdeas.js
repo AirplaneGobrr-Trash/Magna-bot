@@ -19,7 +19,6 @@ module.exports = {
                 { name:"Marry", value:`Marry people!\nProgress:\n${await global.stuff.other.bar(0)}` },
                 { name:"Mod bot", value:`Adv mod bot\nProgress:\n${await global.stuff.other.bar(0)}` }
             )
-        console.log(embed)
 		await interaction.editReply({ content:"Here are the ideas for the bot!",embeds:[embed.data]});
 	},
 };
