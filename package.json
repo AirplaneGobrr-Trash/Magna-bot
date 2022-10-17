@@ -3,10 +3,12 @@
     "@airplanegobrr/database": "^1.0.2",
     "@discordjs/builders": "^1.1.0",
     "@discordjs/rest": "^1.0.1",
+    "chalk": "2.4.2",
     "discord-api-types": "^0.37.2",
     "discord.js": "13.10.2",
     "ejs": "^3.1.8",
     "express": "^4.18.1",
-    "socket.io": "^4.5.1"
+    "socket.io": "^4.5.1",
+    "string-progressbar": "^1.0.4"
   }
 }

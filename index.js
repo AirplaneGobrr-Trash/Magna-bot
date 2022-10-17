@@ -7,17 +7,26 @@ const http = require('http')
 const server = http.createServer(app)
 const io = socketio(server)
 
-global.stuff = { express, app, server, io, eventEmitter }
+const fs = require("fs")
+const other = require("./other")
 
-const expressMod = require("./modules/expressStuff/index.js")
-const socketMod =  require("./modules/socketStuff/index.js")
-const discordMod = require("./modules/discordStuff/index.js")
+global.stuff = { express, app, server, io, eventEmitter, other }
 
-//expressMod.start(express, app, server, io, eventEmitter)
-//socketMod.start(express, app, server, io, eventEmitter)
+// const expressMod = require("./modules/expressStuff/index.js")
+// const socketMod =  require("./modules/socketStuff/index.js")
+// const discordMod = require("./modules/discordStuff/index.js")
+// 
+// //expressMod.start(express, app, server, io, eventEmitter)
+// //socketMod.start(express, app, server, io, eventEmitter)
+// 
+// expressMod.start()
+// socketMod.start()
+// discordMod.start()
 
-expressMod.start()
-socketMod.start()
-discordMod.start()
+const modules = fs.readdirSync("modules")
+for (var file of modules){
+    require(`./modules/${file}`).start()
+}
+
 
 eventEmitter.emit("ready")
