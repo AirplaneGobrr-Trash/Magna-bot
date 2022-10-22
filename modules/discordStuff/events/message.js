@@ -1,12 +1,22 @@
-const functions = require('../../../functions.js');
+const other = require('../../../other');
 
+async function bumpCheck(message){
+    if (message.type !== "APPLICATION_COMMAND") return;
+    console.log(message.interaction)
+    console.log(message.interaction.user)
+    if (message.interaction.commandName == "help") {
+        console.log(`Bump dected for server: ${message.guildId}`)
+        await other.checkServer(message.guildId)
+    }
+}
 
 module.exports = {
     name: 'messageCreate',
     async execute(message, client, Discord) {
-        const { token, debugMode, prefix } = require("../../../config.json");
-
+        const { debugMode, prefix } = require("../../../config.json");
+        await bumpCheck(message)
         if (message.author.bot) return;
+        
         console.log(`${message.author.tag} (${message.author.id}) said: ${message.content}`);
 
         const member = message.author;
