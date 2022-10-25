@@ -2,6 +2,7 @@ const dbClass = require("@airplanegobrr/database")
 const path = require("path")
 const progressbar = require('string-progressbar');
 const chalk = require('chalk')
+const fs = require("fs")
 
 const types = [
     "Main", //0
@@ -31,7 +32,14 @@ async function bar(value){
     return `[${out[0]}] ${out[1]}%`
 }
 
+async function checkFolders(){
+    var dataExist = fs.existsSync(__dirname+"/data")
+    var serversExist = fs.existsSync(__dirname+"/servers")
+    var usersExist = fs.existsSync(__dirname+"/users")
+}
+
 async function checkServer(serverID){
+    await checkFolders()
     var serverPath = path.join(__dirname, "data", "servers", `${serverID}.json`)
     const serverDB = new dbClass(serverPath)
     if (!await serverDB.has("bumpInfo")) serverDB.set("bumpInfo", {
@@ -90,7 +98,8 @@ async function bumpAdd(serverID, userID){
 }
 
 async function checkUser(userID){
-    var userPath = path.join(__dirname, "data", "servers", `${userID}.json`)
+    await checkFolders()
+    var userPath = path.join(__dirname, "data", "users", `${userID}.json`)
     const userDB = new dbClass(userPath)
     if (!await userDB.has("economy")) userDB.set("economy", {})
     if (!await userDB.has("marry")) userDB.set("marry", {})
