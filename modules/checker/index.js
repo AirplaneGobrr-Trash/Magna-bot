@@ -1,15 +1,16 @@
 const fs = require("fs")
 const path = require("path")
 const dbClass = require("@airplanegobrr/database")
+const { MessageEmbed } = require("discord.js")
 
-async function check(){
+async function check() {
     var disClient = global.stuff.discordClient
     var isReady = false
     if (disClient.isReady()) isReady = true
-    
+
     var serversPath = path.join(global.stuff.startDir, "data", "servers")
     var serversFiles = fs.readdirSync(serversPath)
-    for (var serverID of serversFiles){
+    for (var serverID of serversFiles) {
         console.log(`Checking server: ${serverID}`)
         var serverFilePath = path.join(serversPath, serverID)
         var serverDB = new dbClass(serverFilePath)
@@ -17,31 +18,49 @@ async function check(){
             console.log("Found bump info!")
             var currentTime = new Date().valueOf()
             var nextBump = await serverDB.get("bumpInfo.nextBump")
-            var lastBump = await serverDB.get("bumpInfo.lastBump")
+            var nextBumpReminder = await serverDB.get("bumpInfo.nextBumpReminder")
             if (currentTime >= nextBump) {
-                console.log("Ready to bump!")
-                //Reminder to bump server!
-                if (isReady){
-                    console.log("Client is logged in!")
-                    var guildID = serverID.replace(".json", "")
-                    var bumpChannelID = await serverDB.get("bumpInfo.bumpChannel")
-                    var bumpRoleID = await serverDB.get("bumpInfo.bumpRole")
-                    if (!bumpRoleID) bumpRoleID = ""
-                    var bumpChannel = await disClient.channels.cache.get(bumpChannelID);
-                    bumpChannel.send(`Bump the server!`)
+                if (currentTime >= nextBumpReminder) {
+                    console.log(`Ready to bump!`)
+                    //Reminder to bump server!
+                    if (isReady) {
+                        console.log("Client is logged in!")
+                        var guildID = serverID.replace(".json", "")
+                        var bumpChannelID = await serverDB.get("bumpInfo.bumpChannel")
+                        var bumpRoleID = await serverDB.get("bumpInfo.bumpRole")
+                        if (bumpRoleID != null) bumpRoleID = `<@&${bumpRoleID}>`; else bumpRoleID = "No Bump role set!"
+                        var bumpChannel = await disClient.channels.cache.get(bumpChannelID);
+                        if (bumpChannel) {
+                            //await bumpChannel.send(`Bump the server! ${bumpRoleID}`)
+                            const exampleEmbed = {
+                                color: "8A2CE2",
+                                title: "It's time to bump!",
+                                description: 'Bump our server by typing /bump!',
+                                timestamp: new Date().toISOString(),
+                                footer: {
+                                    text: 'By: AirplaneGobrr',
+                                    icon_url: 'https://cdn.discordapp.com/avatars/250029754076495874/d3d522482f97c0c69f826206d04070b1.webp?size=40',
+                                },
+                            }
+
+                            await bumpChannel.send({ embeds: [exampleEmbed], content: `${bumpRoleID}` })
+                            await serverDB.set(`bumpInfo.nextBumpReminder`, currentTime + 900000)
+                            await serverDB.add(`bumpInfo.bumpReminder`, 1)
+                        }
+                    }
                 }
             }
         }
     }
 }
 
-async function start(){
-    setTimeout(async () =>{
+async function start() {
+    setTimeout(async () => {
         await check()
     }, 100)
-    setInterval(async ()=>{
+    setInterval(async () => {
         await check()
-    }, 60*1000)
+    }, 60 * 1000)
 }
 
 module.exports = {

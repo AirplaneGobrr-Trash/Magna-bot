@@ -38,7 +38,9 @@ async function checkServer(serverID){
         lastBump: 0,
         bumpReminder: 0,
         nextBump: 0,
-        nextBumpReminder: 0
+        nextBumpReminder: 0,
+        bumpChannel: null,
+        bumpRole: null
     })
 
     if (!await serverDB.has("users")) serverDB.set("users", {}) // Eco ball, eco inv, uuid of family tree
@@ -51,7 +53,6 @@ async function checkServer(serverID){
         alts: true,
         prefix: null,
         logChannel: null,
-        bumpChannel: null
     })
 }
 
@@ -84,15 +85,16 @@ async function bumpAdd(serverID, userID){
 
     await serverDB.set(`bumpInfo.lastBump`, time)
     await serverDB.set(`bumpInfo.nextBump`, time+7200000)
-    // 2 hours 7200000 
+    await serverDB.set(`bumpInfo.nextBumpReminder`, time+7200000)
+    // 2 hours 7200000
 }
 
 async function checkUser(userID){
     var userPath = path.join(__dirname, "data", "servers", `${userID}.json`)
     const userDB = new dbClass(userPath)
-    if (!await serverDB.has("economy")) serverDB.set("economy", {})
-    if (!await serverDB.has("marry")) serverDB.set("marry", {})
-    if (!await serverDB.has("alts")) serverDB.set("alts", {}) //Alt support from saddness bot?
+    if (!await userDB.has("economy")) userDB.set("economy", {})
+    if (!await userDB.has("marry")) userDB.set("marry", {})
+    if (!await userDB.has("alts")) userDB.set("alts", {}) //Alt support from saddness bot?
 }
 
 module.exports = {

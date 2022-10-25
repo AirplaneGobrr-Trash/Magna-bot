@@ -10,5 +10,6 @@ module.exports = {
         //Go through each command in client.commands and put them in an embed with there description
         var x = message.content.split(" ").slice(1).join(" ")
         var y = message.content.split(" ")
+        message.channel.send("This is a WIP bot!")
     }
 };
