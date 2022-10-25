@@ -17,7 +17,8 @@ module.exports = {
                 { name:"Global ecom", value:`A global ecom!\nProgress:\n${await global.stuff.other.bar(0)}` },
                 { name:"Server ecom", value:`A server basiced ecom!\nProgress:\n${await global.stuff.other.bar(0)}` },
                 { name:"Marry", value:`Marry people!\nProgress:\n${await global.stuff.other.bar(0)}` },
-                { name:"Mod bot", value:`Adv mod bot\nProgress:\n${await global.stuff.other.bar(0)}` }
+                { name:"Mod bot", value:`Adv mod bot\nProgress:\n${await global.stuff.other.bar(0)}` },
+                { name:"Website", value:`Website to change configs\nProgress:\n${await global.stuff.other.bar(1)}` }
             )
 		await interaction.editReply({ content:"Here are the ideas for the bot!",embeds:[embed.data]});
 	},
