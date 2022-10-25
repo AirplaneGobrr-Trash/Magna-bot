@@ -34,8 +34,16 @@ async function bar(value){
 
 async function checkFolders(){
     var dataExist = fs.existsSync(__dirname+"/data")
-    var serversExist = fs.existsSync(__dirname+"/servers")
-    var usersExist = fs.existsSync(__dirname+"/users")
+    var serversExist = fs.existsSync(__dirname+"/data/servers")
+    var usersExist = fs.existsSync(__dirname+"/data/users")
+    if (dataExist) {
+        if (!serversExist) fs.mkdirSync(__dirname+"/data/servers")
+        if (!usersExist) fs.mkdirSync(__dirname+"/data/users")
+    } else {
+        fs.mkdirSync(__dirname+"/data")
+        fs.mkdirSync(__dirname+"/data/servers")
+        fs.mkdirSync(__dirname+"/data/users")
+    }
 }
 
 async function checkServer(serverID){
