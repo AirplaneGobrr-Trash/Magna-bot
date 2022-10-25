@@ -34,19 +34,57 @@ async function bar(value){
 async function checkServer(serverID){
     var serverPath = path.join(__dirname, "data", "servers", `${serverID}.json`)
     const serverDB = new dbClass(serverPath)
-    if (!await serverDB.has("lastbump")) serverDB.set("lastbump", 0)
+    if (!await serverDB.has("bumpInfo")) serverDB.set("bumpInfo", {
+        lastBump: 0,
+        bumpReminder: 0,
+        nextBump: 0,
+        nextBumpReminder: 0
+    })
 
-    if (!await serverDB.has("users")) serverDB.set("users", {})
-    if (!await serverDB.has("economy")) serverDB.set("economy", {})
-    if (!await serverDB.has("marry")) serverDB.set("marry", {})
+    if (!await serverDB.has("users")) serverDB.set("users", {}) // Eco ball, eco inv, uuid of family tree
+    if (!await serverDB.has("economy")) serverDB.set("economy", {}) //Shops, buyables, tec
+    if (!await serverDB.has("marry")) serverDB.set("marry", {}) // random UUID for family tree, family info of tree 
 
     if (!await serverDB.has("settings")) serverDB.set("settings", {
         marry: true,
         economy: true,
         alts: true,
         prefix: null,
-        logChannel: null
+        logChannel: null,
+        bumpChannel: null
     })
+}
+
+async function checkServerUser(serverID, userID){
+    await checkServer(serverID)
+    var serverPath = path.join(__dirname, "data", "servers", `${serverID}.json`)
+    const serverDB = new dbClass(serverPath)
+    if (!await serverDB.has(`users.${userID}`)) serverDB.set(`users.${userID}`, {
+        bal: 0,
+        familyTree: null
+    })
+}
+
+async function bumpAdd(serverID, userID){
+    await checkServer(serverID)
+    await checkServerUser(serverID, userID)
+    var serverPath = path.join(__dirname, "data", "servers", `${serverID}.json`)
+    const serverDB = new dbClass(serverPath)
+    //var time = new Date().toLocaleString('en-US', {
+    //    hour12: false,
+    //    year: 'numeric',
+    //    month: '2-digit',
+    //    day: '2-digit',
+    //    hour: '2-digit',
+    //    minute: '2-digit',
+    //    second: '2-digit',
+    //  })
+
+    var time = new Date().valueOf()
+
+    await serverDB.set(`bumpInfo.lastBump`, time)
+    await serverDB.set(`bumpInfo.nextBump`, time+7200000)
+    // 2 hours 7200000 
 }
 
 async function checkUser(userID){
@@ -62,5 +100,7 @@ module.exports = {
     debug,
     bar,
     checkServer,
-    checkUser
+    checkUser,
+    checkServerUser,
+    bumpAdd
 }

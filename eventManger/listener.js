@@ -4,5 +4,7 @@ var readyModels = 0;
 
 eventEmitter.on("ready", () => {
     readyModels++;
-    console.log(readyModels)
+    if (readyModels == 4) {
+        console.log("Project started!")
+    }
 })

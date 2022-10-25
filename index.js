@@ -10,8 +10,9 @@ const io = socketio(server)
 const fs = require("fs")
 const other = require("./other")
 
-global.stuff = { express, app, server, io, eventEmitter, other }
+global.stuff = { express, app, server, io, eventEmitter, other, startDir: __dirname }
 
+//global.stuff.eventEmitter
 // const expressMod = require("./modules/expressStuff/index.js")
 // const socketMod =  require("./modules/socketStuff/index.js")
 // const discordMod = require("./modules/discordStuff/index.js")

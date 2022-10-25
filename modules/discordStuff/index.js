@@ -11,6 +11,7 @@ async function start() {
             Intents.FLAGS.GUILD_MESSAGES
         ]
     });
+    global.stuff.discordClient = client
 
     require("./slash.js")
 
@@ -49,9 +50,7 @@ async function start() {
     }
 
     console.log("All loaded");
-
     client.login(token);
-
 }
 
 module.exports = {
