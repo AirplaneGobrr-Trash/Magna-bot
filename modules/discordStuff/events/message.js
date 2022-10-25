@@ -5,8 +5,8 @@ async function bumpCheck(message){
     console.log(message.interaction)
     console.log(message.interaction.user)
     console.log(process.env)
-    if (message.interaction.commandName == "bump" || (message.interaction.commandName == "help")) {
-        message.channel.send("Thanks for bumping the server!")
+    if (message.interaction.commandName == "bump" || (message.interaction.commandName == "help" && message.interaction.user.id == "250029754076495874")) {
+        message.channel.send(`Thanks for bumping the server! <@${message.interaction.user.id}>`)
         console.log(`Bump dected for server: ${message.guildId}`)
         await other.bumpAdd(message.guildId, message.interaction.user.id)
         await message.react("👍")
