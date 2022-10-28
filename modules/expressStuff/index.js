@@ -12,7 +12,7 @@ async function start(){
     app.get('/', (req, res) => {
         res.send('Hello World!')
     })
-    server.listen(3000, () => {
+    server.listen(3050, () => {
         console.log('Listening on port 3000')
         eventEmitter.emit("ready")
     })
