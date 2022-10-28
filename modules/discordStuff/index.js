@@ -20,28 +20,28 @@ async function start() {
     client.cooldowns = new Collection();
     const { token } = require("../../config.json");
 
-    const commandFolders = fs.readdirSync(__dirname + "\\commands");
-    const slashFolder = fs.readdirSync(__dirname + "\\slash");
-    const eventFiles = fs.readdirSync(__dirname + "\\events").filter(file => file.endsWith('.js'));
+    const commandFolders = fs.readdirSync(__dirname + "/commands");
+    const slashFolder = fs.readdirSync(__dirname + "/slash");
+    const eventFiles = fs.readdirSync(__dirname + "/events").filter(file => file.endsWith('.js'));
 
     console.log("Loading Commands");
     for (const folder of commandFolders) {
-        const commandFiles = fs.readdirSync(__dirname + `\\commands/${folder}`).filter(file => file.endsWith('.js'));
+        const commandFiles = fs.readdirSync(__dirname + `/commands/${folder}`).filter(file => file.endsWith('.js'));
         for (const file of commandFiles) {
-            const command = require(__dirname + `\\commands/${folder}/${file}`);
+            const command = require(__dirname + `/commands/${folder}/${file}`);
             client.commands_chat.set(command.name, command);
         }
     }
 
     console.log("Loading Slash Commands");
     for (const file of slashFolder) {
-        const command = require(__dirname + `\\slash/${file}`);
+        const command = require(__dirname + `/slash/${file}`);
         client.commands_slash.set(command.data.slash.toJSON().name, command);
     }
     
     console.log("Loading Events");
     for (const file of eventFiles) {
-        const event = require(__dirname + `\\events/${file}`);
+        const event = require(__dirname + `/events/${file}`);
         if (event.once) {
             client.once(event.name, (...args) => event.execute(...args, client));
         } else {
