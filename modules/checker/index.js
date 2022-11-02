@@ -8,6 +8,8 @@ async function check() {
     var isReady = false
     if (disClient.isReady()) isReady = true
 
+    var allServerData = null
+
     // Servers check
     var serversPath = path.join(global.stuff.startDir, "data", "servers")
     var serversFiles = fs.readdirSync(serversPath)
@@ -20,13 +22,16 @@ async function check() {
             var currentTime = new Date().valueOf()
             var nextBump = await serverDB.get("bumpInfo.nextBump")
             var nextBumpReminder = await serverDB.get("bumpInfo.nextBumpReminder")
+            var guildID = serverID.replace(".json", "")
+            allServerData[guildID] = { canBump: false }
             if (currentTime >= nextBump) {
                 if (currentTime >= nextBumpReminder) {
                     console.log(`Ready to bump!`)
+                    allServerData[guildID].canBump = true
                     //Reminder to bump server!
                     if (isReady) {
                         console.log("Client is logged in!")
-                        var guildID = serverID.replace(".json", "")
+                        
                         var bumpChannelID = await serverDB.get("bumpInfo.bumpChannel")
                         var bumpRoleID = await serverDB.get("bumpInfo.bumpRole")
                         if (bumpRoleID != null) bumpRoleID = `<@&${bumpRoleID}>`; else bumpRoleID = "No Bump role set!"
@@ -85,10 +90,20 @@ async function check() {
 
                         if (user) {
                             //await bumpChannel.send(`Bump the server! ${bumpRoleID}`)
+                            
+                            var bumpMessage = ``
+
+                            for (var serverID of userServers){
+                                if (allServerData && allServerData[serverID]){
+                                    var serverData = allServerData[serverID]
+                                    bumpMessage += `\n${serverID}: ${serverData.canBump}`
+                                }
+                            }
+
                             const exampleEmbed = {
                                 color: "8A2CE2",
                                 title: "You can now bump a server again!",
-                                description: 'Check what servers you can go bump! (This will show here what servers you can bump soon)',
+                                description: `Servers: ${bumpMessage}`,
                                 timestamp: new Date().toISOString(),
                                 footer: {
                                     text: 'By: AirplaneGobrr',
