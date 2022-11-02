@@ -82,11 +82,32 @@ async function checkServerUser(serverID, userID){
     })
 }
 
+async function checkUser(userID){
+    await checkFolders()
+    var userPath = path.join(__dirname, "data", "users", `${userID}.json`)
+    const userDB = new dbClass(userPath)
+    if (!await userDB.has("economy")) userDB.set("economy", {})
+    if (!await userDB.has("marry")) userDB.set("marry", {})
+    if (!await userDB.has("bumpInfo")) userDB.set("bumpInfo", {
+        servers: [],
+        lastBump: null,
+        nextAvailableBump: null,
+        totalBumps: 0,
+        reminded: false,
+        remind: true // Weather to DM the user after 30 minuetes
+    })
+    if (!await userDB.has("alts")) userDB.set("alts", {}) //Alt support from saddness bot?
+}
+
 async function bumpAdd(serverID, userID){
     await checkServer(serverID)
     await checkServerUser(serverID, userID)
+    await checkUser(userID)
     var serverPath = path.join(__dirname, "data", "servers", `${serverID}.json`)
+    var userPath = path.join(__dirname, "data", "users", `${userID}.json`)
     const serverDB = new dbClass(serverPath)
+    const userDB = new dbClass(userPath)
+
     //var time = new Date().toLocaleString('en-US', {
     //    hour12: false,
     //    year: 'numeric',
@@ -102,16 +123,18 @@ async function bumpAdd(serverID, userID){
     await serverDB.set(`bumpInfo.lastBump`, time)
     await serverDB.set(`bumpInfo.nextBump`, time+7200000)
     await serverDB.set(`bumpInfo.nextBumpReminder`, time+7200000)
-    // 2 hours 7200000
-}
 
-async function checkUser(userID){
-    await checkFolders()
-    var userPath = path.join(__dirname, "data", "users", `${userID}.json`)
-    const userDB = new dbClass(userPath)
-    if (!await userDB.has("economy")) userDB.set("economy", {})
-    if (!await userDB.has("marry")) userDB.set("marry", {})
-    if (!await userDB.has("alts")) userDB.set("alts", {}) //Alt support from saddness bot?
+    await userDB.set(`bumpInfo.lastBump`, time)
+    await userDB.set(`bumpInfo.nextAvailableBump`, time+1800000)
+    await userDB.add(`bumpInfo.totalBumps`, 1)
+    await userDB.set(`bumpInfo.reminded`, false)
+
+    var userServers = await userDB.get(`bumpInfo.servers`)
+    if (!userServers.includes(serverID)) await userDB.push(`bumpInfo.servers`, serverID)
+
+
+    // 2 hours 7200000
+    // 30 min 1800000
 }
 
 module.exports = {
