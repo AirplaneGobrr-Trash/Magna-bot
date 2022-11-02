@@ -8,7 +8,7 @@ async function check() {
     var isReady = false
     if (disClient.isReady()) isReady = true
 
-    var allServerData = null
+    var allServerData = {}
 
     // Servers check
     var serversPath = path.join(global.stuff.startDir, "data", "servers")
