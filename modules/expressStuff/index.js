@@ -19,13 +19,13 @@ async function start(){
     app.set('views', `${__dirname}/views`)
     //ejs
     app.set('view engine', 'ejs')
-    app.use(express.json());
+    app.use(global.stuff.express.json());
     app.use(login.runner)
 
     app.get('/', (req, res) => {
         res.send('Hello World!')
     })
-    
+
     app.get("/super-secure-resource", (req, res) => {
         if (req.auth) {
             res.send(`<h1>Welcome back ${req.authInfo.user || req.authInfo.username}!</h1>`)
