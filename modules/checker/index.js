@@ -96,7 +96,7 @@ async function check() {
                             for (var serverID of userServers){
                                 if (allServerData && allServerData[serverID]){
                                     var serverData = allServerData[serverID]
-                                    var serverInfo = message.client.guilds.cache.get(serverID)
+                                    var serverInfo = disClient.guilds.cache.get(serverID)
                                     if (serverInfo) {
                                         bumpMessage += `\n${serverInfo.name}: ${serverData.canBump}`
                                     } else {
