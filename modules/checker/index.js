@@ -81,7 +81,9 @@ async function check() {
                     if (isReady) {
                         console.log("Client is logged in!")
 
-                        if (bumpChannel) {
+                        var user = disClient.users.cache.find(user => user.id === realUserID)
+
+                        if (user) {
                             //await bumpChannel.send(`Bump the server! ${bumpRoleID}`)
                             const exampleEmbed = {
                                 color: "8A2CE2",
@@ -94,7 +96,7 @@ async function check() {
                                 },
                             }
 
-                            await bumpChannel.send({ embeds: [exampleEmbed] })
+                            await user.send({ embeds: [exampleEmbed] })
                             await userDB.set(`bumpInfo.reminded`, true)
                         }
                     }
