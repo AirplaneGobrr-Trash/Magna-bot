@@ -5,10 +5,12 @@ const chalk = require('chalk')
 const fs = require("fs")
 
 const types = [
-    "Main", //0
-    "Express", //1
-    "Socket.io", //2
-    "Discord" //3
+    "Main", // 0
+    "Express", // 1
+    "Socket.io", // 2
+    "Discord", // 3
+    "Bump", // 4
+    "Events" // 5
 ]
 
 async function log(type, ...args){

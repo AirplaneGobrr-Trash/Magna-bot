@@ -2,10 +2,10 @@ const other = require('../../../other');
 
 async function bumpCheck(message){
     if (message.type !== "APPLICATION_COMMAND") return;
-    console.log(message.interaction)
+    other.log(3, message.interaction)
     if (message.interaction.commandName == "bump" || (message.interaction.commandName == "help" && message.interaction.user.id == "250029754076495874")) {
         message.channel.send(`Thanks for bumping the server! <@${message.interaction.user.id}>`)
-        console.log(`Bump dected for server: ${message.guildId}`)
+        other.log(3, `Bump dected for server: ${message.guildId}`)
         await other.bumpAdd(message.guildId, message.interaction.user.id)
         await message.react("👍")
     }
@@ -18,7 +18,7 @@ module.exports = {
         await bumpCheck(message)
         if (message.author.bot) return;
         
-        console.log(`${message.author.tag} (${message.author.id}) said: ${message.content}`);
+        other.log(3, `${message.author.tag} (${message.author.id}) said: ${message.content}`);
 
         const member = message.author;
         const guild = message.guild;
@@ -27,10 +27,10 @@ module.exports = {
         const command = args.shift().toLowerCase();
 
         if (debugMode == 1) {
-            console.log(args);
-            console.log(command);
-            console.log(member);
-            console.log(guild);
+            other.log(3, args);
+            other.log(3, command);
+            other.log(3, member);
+            other.log(3, guild);
         }
 
         //Checks if message has the prefix
@@ -45,7 +45,7 @@ module.exports = {
                 message.reply(`there was an error trying to execute that command!`);
             }
         } else {
-            console.log(command)
+            other.log(3, command)
             message.channel.send("I don't know that command!");
             return;
         }

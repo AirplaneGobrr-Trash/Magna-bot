@@ -1,7 +1,7 @@
 const fs = require("fs")
 const path = require("path")
 const dbClass = require("@airplanegobrr/database")
-const { MessageEmbed } = require("discord.js")
+const other = require("../../other.js")
 
 async function check() {
     var disClient = global.stuff.discordClient
@@ -14,11 +14,11 @@ async function check() {
     var serversPath = path.join(global.stuff.startDir, "data", "servers")
     var serversFiles = fs.readdirSync(serversPath)
     for (var serverID of serversFiles) {
-        console.log(`Checking server: ${serverID}`)
+        other.log(4, `Checking server: ${serverID}`)
         var serverFilePath = path.join(serversPath, serverID)
         var serverDB = new dbClass(serverFilePath)
         if (await serverDB.has("bumpInfo")) {
-            console.log("Found bump info!")
+            other.log(4, "Found bump info!")
             var currentTime = new Date().valueOf()
             var nextBump = await serverDB.get("bumpInfo.nextBump")
             var nextBumpReminder = await serverDB.get("bumpInfo.nextBumpReminder")
@@ -26,11 +26,11 @@ async function check() {
             allServerData[guildID] = { canBump: false }
             if (currentTime >= nextBump) {
                 if (currentTime >= nextBumpReminder) {
-                    console.log(`Ready to bump!`)
+                    other.log(4, `Ready to bump!`)
                     allServerData[guildID].canBump = true
                     //Reminder to bump server!
                     if (isReady) {
-                        console.log("Client is logged in!")
+                        other.log(4, "Client is logged in!")
                         
                         var bumpChannelID = await serverDB.get("bumpInfo.bumpChannel")
                         var bumpRoleID = await serverDB.get("bumpInfo.bumpRole")
@@ -65,11 +65,11 @@ async function check() {
     var usersFiles = fs.readdirSync(usersPath)
 
     for (var userID of usersFiles) {
-        console.log(`Checking user: ${userID}`)
+        other.log(4, `Checking user: ${userID}`)
         var userFilePath = path.join(usersPath, userID)
         var userDB = new dbClass(userFilePath)
         if (await userDB.has("bumpInfo")) {
-            console.log("Found bump info!")
+            other.log(4, "Found bump info!")
             var currentTime = new Date().valueOf()
             var nextBump = await userDB.get("bumpInfo.nextAvailableBump")
             var shouldRemind = await userDB.get(`bumpInfo.remind`)
@@ -77,14 +77,14 @@ async function check() {
             var userServers = await userDB.get(`bumpInfo.servers`)
             var realUserID = userID.replace(".json", "")
 
-            if (!shouldRemind) return console.log(`User: ${realUserID}, does not want bump reminder!`)
-            if (alreadyReminded) return console.log(`Already reminded user: ${realUserID} to bump!`)
+            if (!shouldRemind) return other.log(4, `User: ${realUserID}, does not want bump reminder!`)
+            if (alreadyReminded) return other.log(4, `Already reminded user: ${realUserID} to bump!`)
 
             if (currentTime >= nextBump) {
-                    console.log(`Ready to bump!`)
+                    other.log(4, `Ready to bump!`)
                     //Reminder to bump server!
                     if (isReady) {
-                        console.log("Client is logged in!")
+                        other.log(4, "Client is logged in!")
 
                         var user = disClient.users.cache.find(user => user.id === realUserID)
 

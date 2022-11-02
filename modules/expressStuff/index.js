@@ -13,7 +13,7 @@ async function start(){
         res.send('Hello World!')
     })
     server.listen(3050, () => {
-        console.log('Listening on port 3000')
+        console.log('Listening on port 3050')
         eventEmitter.emit("ready")
     })
 }
