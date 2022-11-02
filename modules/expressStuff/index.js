@@ -26,9 +26,10 @@ async function start(){
         res.send('Hello World!')
     })
 
-    app.get("/super-secure-resource", (req, res) => {
+    app.get("/userinfo", (req, res) => {
         if (req.auth) {
-            res.send(`<h1>Welcome back ${req.authInfo.user || req.authInfo.username}!</h1>`)
+            // res.send(`<h1>Welcome back ${req.authInfo.user || req.authInfo.username}!</h1>`)
+            res.json(req.authInfo)
         } else {
             res
             .status(401)
