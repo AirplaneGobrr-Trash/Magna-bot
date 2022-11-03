@@ -146,9 +146,10 @@ async function checkNew() {
     const serverDB = new QuickDB({ driver: mysqlDriver, table: `servers` });
 
     var allServers = await serverDB.all()
-    global.data.allServers = allServers
+    var allServersSend = {}
 
     for (var serverInfo of allServers) {
+        allServersSend[serverInfo.id] = serverInfo.value
         const serverID = serverInfo.id
         other.log(4, `Checking server: ${serverID}`)
 
@@ -198,11 +199,12 @@ async function checkNew() {
     const userDB = new QuickDB({ driver: mysqlDriver, table: `users` });
 
     var allUsers = await userDB.all()
-    global.data.allUsers = allUsers
+    var allUsersSend = {}
 
 
-    for (var userID of allUsers) {
-        userID = userID.id
+    for (var userData of allUsers) {
+        allUsersSend[userData.id] = userData.value
+        var userID = userData.id
         other.log(4, `Checking user: ${userID}`)
 
         if (await userDB.has(`${userID}.bumpInfo`)) {
@@ -260,7 +262,8 @@ async function checkNew() {
                 }
         }
     }
-
+    global.data.allUsers = allUsersSend
+    global.data.allServers = allServersSend
     var eventEmitter = global.stuff.eventEmitter
     eventEmitter.emit("checked", global.data)
 }
