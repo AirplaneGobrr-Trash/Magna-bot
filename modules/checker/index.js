@@ -136,7 +136,8 @@ async function check() {
 }
 
 async function checkNew() {
-    await mysqlDriver.connect();
+    if (!mysqlDriver.conn) await mysqlDriver.connect();
+    
     var disClient = global.stuff.discordClient
     var isReady = false
     if (disClient.isReady()) isReady = true
