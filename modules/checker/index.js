@@ -269,6 +269,9 @@ async function start() {
     setTimeout(async () => {
         await checkNew()
     }, 100)
+    setInterval(async () => {
+        await checkNew()
+    }, 60 * 1000)
     // setInterval(async () => {
     //     await check()
     // }, 60 * 1000)
