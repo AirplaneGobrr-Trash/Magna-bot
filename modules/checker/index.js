@@ -2,7 +2,6 @@ const fs = require("fs")
 const path = require("path")
 const dbClass = require("@airplanegobrr/database")
 const other = require("../../other.js")
-const eventEmitter = global.stuff.eventEmitter
 
 const { QuickDB } = require("quick.db");
 
@@ -136,6 +135,7 @@ async function checkNew() {
     global.data.allUsers = allUsersSend
     global.data.allServers = allServersSend
 
+    const eventEmitter = global.stuff.eventEmitter
     eventEmitter.emit("checked", global.data)
 }
 
