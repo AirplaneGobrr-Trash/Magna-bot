@@ -5,7 +5,13 @@ const app = express()
 const socketio = require('socket.io')
 const http = require('http')
 const server = http.createServer(app)
-const io = socketio(server)
+const io = new socketio(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    },
+    maxHttpBufferSize: 1e8 // 100 MB
+});
 
 const fs = require("fs")
 const other = require("./other")
