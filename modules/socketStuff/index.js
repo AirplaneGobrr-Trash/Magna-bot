@@ -11,8 +11,7 @@ async function start(){
     })
 
     io.on('connection', (socket) => {
-        console.log('a user connected');
-        console.log(socket)
+        console.log('a new user connected');
         socket.on("getCheck", (cb)=>{
             cb(global.data)
         })
