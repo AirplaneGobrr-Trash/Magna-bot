@@ -10,9 +10,10 @@ async function start(){
         io.emit("checked", data)
     })
 
-    io.on('connection', (socket) => {
+    io.on('connection', async (socket) => {
         console.log('a new user connected');
-        console.log(socket)
+        var cookies = cookie.parse(socket.handshake.headers.cookie)
+        console.log(cookies)
         socket.on("getCheck", ()=>{
             socket.emit("checked", global.data)
         })
