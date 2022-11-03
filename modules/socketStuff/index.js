@@ -12,10 +12,11 @@ async function start(){
 
     io.on('connection', (socket) => {
         console.log('a new user connected');
-        socket.on("getCheck", (cb)=>{
-            cb(global.data)
+        console.log(socket)
+        socket.on("getCheck", ()=>{
+            socket.emit("checked", global.data)
         })
-      });
+    });
 }
 
 module.exports = {
