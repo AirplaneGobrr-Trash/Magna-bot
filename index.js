@@ -11,6 +11,7 @@ const fs = require("fs")
 const other = require("./other")
 
 global.stuff = { express, app, server, io, eventEmitter, other, startDir: __dirname }
+global.data = {}
 
 //global.stuff.eventEmitter
 // const expressMod = require("./modules/expressStuff/index.js")

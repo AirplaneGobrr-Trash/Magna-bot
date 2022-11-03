@@ -26,6 +26,14 @@ async function start(){
         res.send('Hello World!')
     })
 
+    app.get("/check", (req, res) => {
+        if (req.auth) {
+            res.render("check")
+        } else {
+            res.status(401).json({ message: "You need to be logged in to access this resource" });
+        }
+    })
+
     app.get("/userinfo", (req, res) => {
         if (req.auth) {
             // res.send(`<h1>Welcome back ${req.authInfo.user || req.authInfo.username}!</h1>`)
