@@ -2,7 +2,7 @@ lockfileVersion: 5.3
 
 specifiers:
   '@airplanegobrr/database': ^1.0.2
-  '@airplanegobrr/express-login': ^1.0.3
+  '@airplanegobrr/express-login': 1.0.4
   '@discordjs/builders': ^1.1.0
   '@discordjs/rest': ^1.0.1
   chalk: 2.4.2
@@ -18,7 +18,7 @@ specifiers:
 
 dependencies:
   '@airplanegobrr/database': 1.0.2
-  '@airplanegobrr/express-login': 1.0.3
+  '@airplanegobrr/express-login': 1.0.4
   '@discordjs/builders': 1.1.0
   '@discordjs/rest': 1.0.1
   chalk: 2.4.2
@@ -38,8 +38,8 @@ packages:
     resolution: {integrity: sha512-iekBSCHrT73AeNpLKr7ICRUU9EVW2iC6qwVKZGpyaO8tpX88G0ffgSfubkCa1uDYH7A8v/6curo3CUcIfh0jgA==}
     dev: false
 
-  /@airplanegobrr/express-login/1.0.3:
-    resolution: {integrity: sha512-pg86r2kJHTZXPxVpaA9+wnkNzbiy1lHf8Ybg6t8uvwvf6D0UKJzjl8ZGy6BNSedhJcL/Y1C7fkb4dPD+8Vra7w==}
+  /@airplanegobrr/express-login/1.0.4:
+    resolution: {integrity: sha512-mDFUDuDbgt431x4L7pDoSSzRFTJyX7Q0Pv6li/HenbNqfbIksOFs9g+3iBDT3XtchpRU2WfxLqidRyrMwbb/cw==}
     dependencies:
       '@airplanegobrr/database': 1.0.2
       cookie: 0.5.0

@@ -1,4 +1,7 @@
+const expressLoginClass = require("@airplanegobrr/express-login")
 const cookie = require("cookie")
+
+const loginChecker = new expressLoginClass({}, "STUPID", "JWT_Token")
 
 async function start(){
     var eventEmitter = global.stuff.eventEmitter
@@ -14,6 +17,9 @@ async function start(){
         console.log('a new user connected');
         var cookies = cookie.parse(socket.handshake.headers.cookie)
         console.log(cookies)
+        var check = await loginChecker.checkAuth(cookies.auth)
+        console.log(check)
+
         socket.on("getCheck", ()=>{
             socket.emit("checked", global.data)
         })
