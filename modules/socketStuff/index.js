@@ -11,10 +11,8 @@ async function start(){
     })
 
     io.on('connection', (socket) => {
-        var cookief = socket.handshake.headers.cookie; 
-        var cookies = cookie.parse(socket.handshake.headers.cookie); 
-        console.log(cookief, cookies)
         console.log('a user connected');
+        console.log(socket)
         socket.on("getCheck", (cb)=>{
             cb(global.data)
         })
