@@ -10,19 +10,20 @@ async function start(){
     var io = global.stuff.io
 
     eventEmitter.on("checked", (data)=>{
-        console.log("Got data!")
-        io.emit("checked", data)
+        io.to("admins").emit("checked", data)
     })
 
     io.on('connection', async (socket) => {
         console.log('a new user connected');
         var cookies = cookie.parse(socket.handshake.headers.cookie)
-        console.log(cookies)
         var check = await loginChecker.checkAuth(cookies.auth)
-        console.log(check)
+
+        if (check.auth) {
+            socket.join("admins");
+        }
 
         socket.on("getCheck", ()=>{
-            socket.emit("checked", global.data)
+            if (check.auth) socket.emit("checked", global.data); else { socket.emit("checked", "INVAILD LOGIN!")}
         })
     });
 }
