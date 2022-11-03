@@ -3,7 +3,16 @@ const path = require("path")
 const dbClass = require("@airplanegobrr/database")
 const other = require("../../other.js")
 
+const { QuickDB, MySQLDriver } = require("quick.db");
+const mysqlDriver = new MySQLDriver({
+    host: "192.168.4.121",
+    user: "magna_bot",
+    password: "muqZHbE#*xDScq91%Y^9ey1^vsRNvk25YVif6&wa$B3FXzD^fB",
+    database: "magna",
+});
+
 async function check() {
+    await mysqlDriver.connect();
     var disClient = global.stuff.discordClient
     var isReady = false
     if (disClient.isReady()) isReady = true
@@ -16,7 +25,7 @@ async function check() {
     for (var serverID of serversFiles) {
         other.log(4, `Checking server: ${serverID}`)
         var serverFilePath = path.join(serversPath, serverID)
-        var serverDB = new dbClass(serverFilePath)
+        var serverDB = new QuickDB({ driver: mysqlDriver, table: `servers${serverID.replace(".json", "")}` });
         if (await serverDB.has("bumpInfo")) {
             other.log(4, "Found bump info!")
             var currentTime = new Date().valueOf()
@@ -67,7 +76,7 @@ async function check() {
     for (var userID of usersFiles) {
         other.log(4, `Checking user: ${userID}`)
         var userFilePath = path.join(usersPath, userID)
-        var userDB = new dbClass(userFilePath)
+        var userDB = new QuickDB({ driver: mysqlDriver, table: `users${userID.replace(".json", "")}` });
         if (await userDB.has("bumpInfo")) {
             other.log(4, "Found bump info!")
             var currentTime = new Date().valueOf()
@@ -126,13 +135,17 @@ async function check() {
     }
 }
 
+async function checkNew() {
+
+}
+
 async function start() {
-    setTimeout(async () => {
-        await check()
-    }, 100)
-    setInterval(async () => {
-        await check()
-    }, 60 * 1000)
+    // setTimeout(async () => {
+    //     await check()
+    // }, 100)
+    // setInterval(async () => {
+    //     await check()
+    // }, 60 * 1000)
 }
 
 module.exports = {

@@ -4,6 +4,18 @@ const progressbar = require('string-progressbar');
 const chalk = require('chalk')
 const fs = require("fs")
 
+const { QuickDB, MySQLDriver } = require("quick.db");
+const mysqlDriver = new MySQLDriver({
+    host: "192.168.4.121",
+    user: "magna_bot",
+    password: "muqZHbE#*xDScq91%Y^9ey1^vsRNvk25YVif6&wa$B3FXzD^fB",
+    database: "magna",
+});
+
+async function alwaysRun(){
+    await mysqlDriver.connect();
+}
+
 const types = [
     "Main", // 0
     "Express", // 1
@@ -34,81 +46,66 @@ async function bar(value){
     return `[${out[0]}] ${out[1]}%`
 }
 
-async function checkFolders(){
-    var dataExist = fs.existsSync(__dirname+"/data")
-    var serversExist = fs.existsSync(__dirname+"/data/servers")
-    var usersExist = fs.existsSync(__dirname+"/data/users")
-    if (dataExist) {
-        if (!serversExist) fs.mkdirSync(__dirname+"/data/servers")
-        if (!usersExist) fs.mkdirSync(__dirname+"/data/users")
-    } else {
-        fs.mkdirSync(__dirname+"/data")
-        fs.mkdirSync(__dirname+"/data/servers")
-        fs.mkdirSync(__dirname+"/data/users")
-    }
-}
-
 async function checkServer(serverID){
-    await checkFolders()
-    var serverPath = path.join(__dirname, "data", "servers", `${serverID}.json`)
-    const serverDB = new dbClass(serverPath)
-    if (!await serverDB.has("bumpInfo")) serverDB.set("bumpInfo", {
-        lastBump: 0,
-        bumpReminder: 0,
-        nextBump: 0,
-        nextBumpReminder: 0,
-        bumpChannel: null,
-        bumpRole: null
-    })
-
-    if (!await serverDB.has("users")) serverDB.set("users", {}) // Eco ball, eco inv, uuid of family tree
-    if (!await serverDB.has("economy")) serverDB.set("economy", {}) //Shops, buyables, tec
-    if (!await serverDB.has("marry")) serverDB.set("marry", {}) // random UUID for family tree, family info of tree 
-
-    if (!await serverDB.has("settings")) serverDB.set("settings", {
-        marry: true,
-        economy: true,
-        alts: true,
-        prefix: null,
-        logChannel: null,
+    await alwaysRun()
+    const serverDB = new QuickDB({ driver: mysqlDriver, table: `servers` });
+    if (!await serverDB.has(`${serverID}`)) await serverDB.set(`${serverID}`, {
+        bumpInfo: {
+            lastBump: 0,
+            bumpReminder: 0,
+            nextBump: 0,
+            nextBumpReminder: 0,
+            bumpChannel: null,
+            bumpRole: null
+        },
+        users: {},
+        economy: {},
+        marry: {},
+        settings: {
+            marry: true,
+            economy: true,
+            alts: true,
+            prefix: null,
+            logChannel: null,
+        }
     })
 }
 
 async function checkServerUser(serverID, userID){
-    await checkServer(serverID)
-    var serverPath = path.join(__dirname, "data", "servers", `${serverID}.json`)
-    const serverDB = new dbClass(serverPath)
-    if (!await serverDB.has(`users.${userID}`)) serverDB.set(`users.${userID}`, {
+    await alwaysRun()
+    const serverDB = new QuickDB({ driver: mysqlDriver, table: `servers` });
+    if (!await serverDB.has(`${serverID}.users.${userID}`)) serverDB.set(`${serverID}.users.${userID}`, {
         bal: 0,
         familyTree: null
     })
 }
 
 async function checkUser(userID){
-    await checkFolders()
-    var userPath = path.join(__dirname, "data", "users", `${userID}.json`)
-    const userDB = new dbClass(userPath)
-    if (!await userDB.has("economy")) userDB.set("economy", {})
-    if (!await userDB.has("marry")) userDB.set("marry", {})
-    if (!await userDB.has("bumpInfo")) userDB.set("bumpInfo", {
-        servers: [],
-        lastBump: null,
-        nextAvailableBump: null,
-        totalBumps: 0,
-        reminded: false,
-        remind: true // Weather to DM the user after 30 minuetes
+    await alwaysRun()
+    const userDB = new QuickDB({ driver: mysqlDriver, table: `users` });
+    if (!await userDB.has(`${userID}`)) await userDB.set(`${userID}`, {
+        alts: {},
+        marry: {},
+        economy: {},
+        bumpInfo: {
+            servers: [],
+            lastBump: null,
+            nextAvailableBump: null,
+            totalBumps: 0,
+            reminded: false,
+            remind: true // Weather to DM the user after 30 minuetes
+        }
     })
-    if (!await userDB.has("alts")) userDB.set("alts", {}) //Alt support from saddness bot?
 }
 
 async function bumpAdd(serverID, userID){
+    await alwaysRun()
     await checkServer(serverID)
     await checkServerUser(serverID, userID)
     await checkUser(userID)
-    var serverPath = path.join(__dirname, "data", "servers", `${serverID}.json`)
-    var userPath = path.join(__dirname, "data", "users", `${userID}.json`)
-    const serverDB = new dbClass(serverPath)
-    const userDB = new dbClass(userPath)
+
+    const serverDB = new QuickDB({ driver: mysqlDriver, table: `servers` });
+    const userDB = new QuickDB({ driver: mysqlDriver, table: `users` });
 
     //var time = new Date().toLocaleString('en-US', {
     //    hour12: false,
@@ -122,17 +119,17 @@ async function bumpAdd(serverID, userID){
 
     var time = new Date().valueOf()
 
-    await serverDB.set(`bumpInfo.lastBump`, time)
-    await serverDB.set(`bumpInfo.nextBump`, time+7200000)
-    await serverDB.set(`bumpInfo.nextBumpReminder`, time+7200000)
+    await serverDB.set(`${serverID}.bumpInfo.lastBump`, time)
+    await serverDB.set(`${serverID}.bumpInfo.nextBump`, time+7200000)
+    await serverDB.set(`${serverID}.bumpInfo.nextBumpReminder`, time+7200000)
 
-    await userDB.set(`bumpInfo.lastBump`, time)
-    await userDB.set(`bumpInfo.nextAvailableBump`, time+1800000)
-    await userDB.add(`bumpInfo.totalBumps`, 1)
-    await userDB.set(`bumpInfo.reminded`, false)
+    await userDB.set(`${userID}.bumpInfo.lastBump`, time)
+    await userDB.set(`${userID}.bumpInfo.nextAvailableBump`, time+1800000)
+    await userDB.add(`${userID}.bumpInfo.totalBumps`, 1)
+    await userDB.set(`${userID}.bumpInfo.reminded`, false)
 
-    var userServers = await userDB.get(`bumpInfo.servers`)
-    if (!userServers.includes(serverID)) await userDB.push(`bumpInfo.servers`, serverID)
+    var userServers = await userDB.get(`${userID}.bumpInfo.servers`)
+    if (!userServers.includes(serverID)) await userDB.push(`${userID}.bumpInfo.servers`, serverID)
 
 
     // 2 hours 7200000
