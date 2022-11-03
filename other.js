@@ -4,17 +4,7 @@ const progressbar = require('string-progressbar');
 const chalk = require('chalk')
 const fs = require("fs")
 
-const { QuickDB, MySQLDriver } = require("quick.db");
-const mysqlDriver = new MySQLDriver({
-    host: "192.168.4.121",
-    user: "magna_bot",
-    password: "muqZHbE#*xDScq91%Y^9ey1^vsRNvk25YVif6&wa$B3FXzD^fB",
-    database: "magna",
-});
-
-async function alwaysRun(){
-    await mysqlDriver.connect();
-}
+const { QuickDB } = require("quick.db");
 
 const types = [
     "Main", // 0
@@ -48,7 +38,7 @@ async function bar(value){
 
 async function checkServer(serverID){
     await alwaysRun()
-    const serverDB = new QuickDB({ driver: mysqlDriver, table: `servers` });
+    const serverDB = new QuickDB({ driver: global.mysqlDriver, table: `servers` });
     if (!await serverDB.has(`${serverID}`)) await serverDB.set(`${serverID}`, {
         bumpInfo: {
             lastBump: 0,
@@ -73,7 +63,7 @@ async function checkServer(serverID){
 
 async function checkServerUser(serverID, userID){
     await alwaysRun()
-    const serverDB = new QuickDB({ driver: mysqlDriver, table: `servers` });
+    const serverDB = new QuickDB({ driver: global.mysqlDriver, table: `servers` });
     if (!await serverDB.has(`${serverID}.users.${userID}`)) serverDB.set(`${serverID}.users.${userID}`, {
         bal: 0,
         familyTree: null
@@ -82,7 +72,7 @@ async function checkServerUser(serverID, userID){
 
 async function checkUser(userID){
     await alwaysRun()
-    const userDB = new QuickDB({ driver: mysqlDriver, table: `users` });
+    const userDB = new QuickDB({ driver: global.mysqlDriver, table: `users` });
     if (!await userDB.has(`${userID}`)) await userDB.set(`${userID}`, {
         alts: {},
         marry: {},
@@ -104,8 +94,8 @@ async function bumpAdd(serverID, userID){
     await checkServerUser(serverID, userID)
     await checkUser(userID)
 
-    const serverDB = new QuickDB({ driver: mysqlDriver, table: `servers` });
-    const userDB = new QuickDB({ driver: mysqlDriver, table: `users` });
+    const serverDB = new QuickDB({ driver: global.mysqlDriver, table: `servers` });
+    const userDB = new QuickDB({ driver: global.mysqlDriver, table: `users` });
 
     //var time = new Date().toLocaleString('en-US', {
     //    hour12: false,

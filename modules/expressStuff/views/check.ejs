@@ -14,6 +14,9 @@
         socket.on("checked", (data)=>{
             console.log(data)
         })
+        socket.emit("getCheck", (data)=>{
+            console.log(data)
+        })
       </script>
 </body>
 </html>

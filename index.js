@@ -31,10 +31,23 @@ global.data = {}
 // socketMod.start()
 // discordMod.start()
 
-const modules = fs.readdirSync("modules")
-for (var file of modules){
-    require(`./modules/${file}`).start()
-}
+const { MySQLDriver } = require("quick.db");
+const mysqlDriver = new MySQLDriver({
+    host: "192.168.4.121",
+    user: "magna_bot",
+    password: "muqZHbE#*xDScq91%Y^9ey1^vsRNvk25YVif6&wa$B3FXzD^fB",
+    database: "magna",
+});
+
+(async ()=>{
+    await mysqlDriver.connect();
+    global.mysqlDriver = mysqlDriver
+    const modules = fs.readdirSync("modules")
+    for (var file of modules){
+        require(`./modules/${file}`).start()
+    }
+})
+
 
 
 eventEmitter.emit("ready")

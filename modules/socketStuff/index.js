@@ -1,3 +1,5 @@
+const cookie = require("cookie")
+
 async function start(){
     var eventEmitter = global.stuff.eventEmitter
     eventEmitter.emit("ready")
@@ -9,7 +11,13 @@ async function start(){
     })
 
     io.on('connection', (socket) => {
+        var cookief = socket.handshake.headers.cookie; 
+        var cookies = cookie.parse(socket.handshake.headers.cookie); 
+        console.log(cookief, cookies)
         console.log('a user connected');
+        socket.on("getCheck", (cb)=>{
+            cb(global.data)
+        })
       });
 }
 
