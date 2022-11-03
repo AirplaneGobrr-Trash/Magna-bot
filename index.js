@@ -39,14 +39,15 @@ const mysqlDriver = new MySQLDriver({
     database: "magna",
 });
 
-(async ()=>{
+async function start() {
     await mysqlDriver.connect();
     global.mysqlDriver = mysqlDriver
     const modules = fs.readdirSync("modules")
     for (var file of modules){
         require(`./modules/${file}`).start()
     }
-})
+}
+start()
 
 
 
