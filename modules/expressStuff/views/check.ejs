@@ -11,6 +11,9 @@
     <h1>Hello world!</h1>
     <script>
         var socket = io();
+        socket.on("checked", (data)=>{
+            console.log(data)
+        })
       </script>
 </body>
 </html>

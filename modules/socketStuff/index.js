@@ -4,6 +4,10 @@ async function start(){
 
     var io = global.stuff.io
 
+    eventEmitter.on("checked", (data)=>{
+        io.emit("checked", data)
+    })
+
     io.on('connection', (socket) => {
         console.log('a user connected');
       });
