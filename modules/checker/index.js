@@ -85,8 +85,14 @@ async function checkNew() {
             var alreadyReminded = await userDB.get(`${userID}.bumpInfo.reminded`)
             var userServers = await userDB.get(`${userID}.bumpInfo.servers`)
 
-            if (!shouldRemind) return other.log(4, `User: ${userID}, does not want bump reminder!`)
-            if (alreadyReminded) return other.log(4, `Already reminded user: ${userID} to bump!`)
+            if (!shouldRemind) {
+                other.log(4, `User: ${userID}, does not want bump reminder!`)
+                continue
+            } 
+            if (alreadyReminded) {
+                other.log(4, `Already reminded user: ${userID} to bump!`)
+                continue
+            }
 
             if (currentTime >= nextBump) {
                     other.log(4, `Ready to bump!`)
