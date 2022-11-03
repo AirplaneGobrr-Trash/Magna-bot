@@ -10,6 +10,7 @@ async function start(){
     var io = global.stuff.io
 
     eventEmitter.on("checked", (data)=>{
+        console.log("Got data!")
         io.emit("checked", data)
     })
 
