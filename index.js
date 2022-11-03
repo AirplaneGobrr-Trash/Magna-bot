@@ -5,7 +5,7 @@ const app = express()
 const socketio = require('socket.io')
 const http = require('http')
 const server = http.createServer(app)
-const io = new socketio(server, {
+const io = socketio(server, {
     cors: {
         origin: "*",
         methods: ["GET", "POST"]
