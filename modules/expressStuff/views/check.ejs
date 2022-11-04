@@ -12,11 +12,15 @@
     <h1>Hello world!</h1>
     <select id="picker"></select>
     <div id="editor"></div>
+    <textarea id="jsonEditor"></textarea>
+    <button id="update">Update</button>
     <script>
         var socket = io("http://magna.airplanegobrr.xyz");
 
         const editor = document.getElementById("editor")
         const picker = document.getElementById("picker")
+        const jsonEditor = document.getElementById("jsonEditor")
+        const update = document.getElementById("update")
 
         async function updateUser(userID, userData){
 
@@ -55,18 +59,34 @@
                 picker.append(opt)
             }
 
+            var currentPick = {}
+
             picker.onchange = (e) => {
                 console.log(e)
                 var currentOpt = e.target.options[e.target.options.selectedIndex]
+                currentPick.elm = currentOpt
+
                 if (currentOpt.type == "server") {
                     console.log("Server", currentOpt.id)
                     var serverData = data.data.allServers[currentOpt.id]
+                    currentPick.data = serverData
+                    currentPick.type = "server"
                     console.log(serverData)
+                    jsonEditor.innerText = JSON.stringify(serverData, null, 4)
+
                 } else if (currentOpt.type == "user") {
                     console.log("User!", currentOpt.id)
                     var userData = data.data.allUsers[currentOpt.id]
+                    currentPick.data = userData
+                    currentPick.type = "user"
                     console.log(userData)
+                    jsonEditor.innerText = JSON.stringify(userData, null, 4)
+
                 }
+            }
+
+            update.onclick = (e) => {
+                console.log(e,currentPick)
             }
         })
 
