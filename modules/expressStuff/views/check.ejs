@@ -10,7 +10,7 @@
 </head>
 <body>
     <h1>Hello world!</h1>
-    <select id="picker"></select>
+    <select id="picker"></select> <button id="refresh">Reload</button>
     <div id="editor"></div>
     <textarea id="jsonEditor"></textarea>
     <button id="update">Update</button>
@@ -21,6 +21,8 @@
         const picker = document.getElementById("picker")
         const jsonEditor = document.getElementById("jsonEditor")
         const update = document.getElementById("update")
+        const refresh = document.getElementById("refresh")
+
 
         async function updateUser(userID, userData){
 
@@ -98,6 +100,10 @@
                         console.log("Done! Updated!",a)
                     })
                 }
+            }
+
+            refresh.onclick = (e) =>{
+                jsonEditor.innerText = JSON.stringify(currentPick.data)
             }
         })
 
