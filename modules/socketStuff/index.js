@@ -23,7 +23,7 @@ async function start(){
         }
 
         socket.on("getCheck", ()=>{
-            if (check.auth) socket.emit("checked", global.data); else { socket.emit("checked", "INVAILD LOGIN!")}
+            if (check.auth) socket.emit("checked", { data:global.data, userdata: check }); else { socket.emit("checked", "INVAILD LOGIN!")}
         })
     });
 }
