@@ -34,14 +34,14 @@
             opt.innerText = "-- Servers --"
             picker.append(opt)
 
-            for (var server of data.allServers){
+            for (var server of data.data.allServers){
                 console.log(server)
             }
 
             var opt = document.createElement("option")
             opt.innerText = "-- Users --"
             picker.append(opt)
-            for (var user of data.allUsers){
+            for (var user of data.data.allUsers){
                 console.log(user)
             }
         })
