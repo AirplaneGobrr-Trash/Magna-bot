@@ -10,12 +10,13 @@
 </head>
 <body>
     <h1>Hello world!</h1>
+    <select id="picker"></select>
     <div id="editor"></div>
     <script>
         var socket = io("http://magna.airplanegobrr.xyz");
-        socket.emit("getCheck")
 
         const editor = document.getElementById("editor")
+        const picker = document.getElementById("picker")
 
         async function updateUser(userID, userData){
 
@@ -29,12 +30,29 @@
         socket.once("checked", (data)=>{
             setup = true
             console.log("once\n",data)
+            var opt = document.createElement("option")
+            opt.innerText = "-- Servers --"
+            picker.append(opt)
+
+            for (var server of data.allServers){
+                console.log(server)
+            }
+
+            var opt = document.createElement("option")
+            opt.innerText = "-- Users --"
+            picker.append(opt)
+            for (var user of data.allUsers){
+                console.log(user)
+            }
         })
 
         socket.on("checked", (data)=>{
             if (!setup) return
             console.log(data)
         })
+
+        socket.emit("getCheck")
+
       </script>
 </body>
 </html>
