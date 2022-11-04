@@ -82,6 +82,11 @@ async function checkNew() {
         var userID = userData.id
         other.log(4, `Checking user: ${userID}`)
 
+        if (isReady) {
+            var user = await disClient.users.cache.get(userID)
+            await userDB.set(`${userID}.name`, user.username)
+        }
+
         if (await userDB.has(`${userID}.bumpInfo`)) {
             other.log(4, "Found bump info!")
             var currentTime = new Date().valueOf()
