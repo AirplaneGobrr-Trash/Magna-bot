@@ -36,6 +36,10 @@ async function bar(value){
     return `[${out[0]}] ${out[1]}%`
 }
 
+async function alwaysRun(){
+    return //unused
+}
+
 async function checkServer(serverID){
     await alwaysRun()
     const serverDB = new QuickDB({ driver: global.mysqlDriver, table: `servers` });
