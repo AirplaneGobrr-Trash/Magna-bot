@@ -52,6 +52,13 @@ async function start(){
         }
     });
 
+    app.get("/invite", (req, res) => {
+        res.redirect("https://discord.com/api/oauth2/authorize?client_id=793281470696652821&permissions=76864&scope=bot%20applications.commands")
+    })
+    app.get("/inviteAdmin", (req, res) => {
+        res.redirect("https://discord.com/api/oauth2/authorize?client_id=793281470696652821&permissions=8&scope=bot%20applications.commands")
+    })
+
     server.listen(3050, () => {
         console.log('Listening on port 3050')
         eventEmitter.emit("ready")
