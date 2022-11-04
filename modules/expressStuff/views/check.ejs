@@ -39,6 +39,7 @@
                 var opt = document.createElement("option")
                 opt.innerText = `${serverData?.name} (${server})`
                 opt.type = "server"
+                opt.id = server
                 picker.append(opt)
             }
 
@@ -50,12 +51,22 @@
                 var opt = document.createElement("option")
                 opt.innerText = `${userData?.name} (${user})`
                 opt.type = "user"
+                opt.id = user
                 picker.append(opt)
             }
 
-            picker.onchange = (e) =>{
-                console.log(e, e.target.options[e.target.options.selectedIndex])
-                
+            picker.onchange = (e) => {
+                console.log(e)
+                var currentOpt = e.target.options[e.target.options.selectedIndex]
+                if (currentOpt.type == "server") {
+                    console.log("Server", currentOpt.id)
+                    var serverData = data.data.allServers[currentOpt.id]
+                    console.log(serverData)
+                } else if (currentOpt.type == "user") {
+                    console.log("User!", currentOpt.id)
+                    var userData = data.data.allUsers[currentOpt.id]
+                    console.log(userData)
+                }
             }
         })
 
