@@ -3,6 +3,9 @@ const cookie = require("cookie")
 
 const loginChecker = new expressLoginClass({}, "STUPID", "JWT_Token")
 
+const { QuickDB } = require("quick.db");
+
+
 // Change to MySQL ?
 const superAdmins = [
     "250029754076495874"
@@ -33,6 +36,18 @@ async function start(){
 
         socket.on("getCheck", ()=>{
             if (check.auth) socket.emit("checked", { data:global.data, userdata: check }); else { socket.emit("checked", "INVAILD LOGIN!")}
+        })
+
+        socket.on("admin/user/update", async (userID, userData, cb)=>{
+            const userDB = new QuickDB({ driver: global.mysqlDriver, table: `users` });
+            await userDB.set(userID, userData)
+            cb(userData)
+        })
+
+        socket.on("admin/server/update", async (serverID, serverData, cb)=>{
+            const serverDB = new QuickDB({ driver: global.mysqlDriver, table: `servers` });
+            await serverDB.set(serverID, serverData)
+            cb(serverData)
         })
     });
 }
