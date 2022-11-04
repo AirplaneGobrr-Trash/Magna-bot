@@ -29,6 +29,8 @@ async function checkNew() {
             var nextBump = await serverDB.get(`${serverID}.bumpInfo.nextBump`)
             var nextBumpReminder = await serverDB.get(`${serverID}.bumpInfo.nextBumpReminder`)
 
+            if (isReady) await serverDB.set(`${serverID}.name`, await disClient.guilds.cache.get(serverID).name())
+
             allServerData[serverID] = { canBump: false }
             if (currentTime >= nextBump) {
                 if (currentTime >= nextBumpReminder) {

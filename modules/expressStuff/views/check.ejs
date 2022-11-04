@@ -38,6 +38,7 @@
                 console.log(data.data.allServers[server])
                 var opt = document.createElement("option")
                 opt.innerText = server
+                opt.type = "server"
                 picker.append(opt)
             }
 
@@ -48,6 +49,7 @@
                 console.log(data.data.allUsers[user])
                 var opt = document.createElement("option")
                 opt.innerText = user
+                opt.type = "user"
                 picker.append(opt)
             }
         })
