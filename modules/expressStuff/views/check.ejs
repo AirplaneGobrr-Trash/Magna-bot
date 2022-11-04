@@ -36,6 +36,9 @@
 
             for (var server in data.data.allServers){
                 console.log(data.data.allServers[server])
+                var opt = document.createElement("option")
+                opt.innerText = server
+                picker.append(opt)
             }
 
             var opt = document.createElement("option")
@@ -43,6 +46,9 @@
             picker.append(opt)
             for (var user in data.data.allUsers){
                 console.log(data.data.allUsers[user])
+                var opt = document.createElement("option")
+                opt.innerText = user
+                picker.append(opt)
             }
         })
 
