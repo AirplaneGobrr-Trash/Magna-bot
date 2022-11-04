@@ -72,7 +72,7 @@
                     currentPick.data = serverData
                     currentPick.type = "server"
                     console.log(serverData)
-                    jsonEditor.innerText = JSON.stringify(serverData, null, 4)
+                    jsonEditor.innerText = JSON.stringify(serverData, null, 2)
 
                 } else if (currentOpt.type == "user") {
                     console.log("User!", currentOpt.id)
@@ -80,7 +80,7 @@
                     currentPick.data = userData
                     currentPick.type = "user"
                     console.log(userData)
-                    jsonEditor.innerText = JSON.stringify(userData, null, 4)
+                    jsonEditor.innerText = JSON.stringify(userData, null, 2)
 
                 }
             }
