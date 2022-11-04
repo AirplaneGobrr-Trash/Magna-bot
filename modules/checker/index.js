@@ -31,7 +31,7 @@ async function checkNew() {
 
             if (isReady) {
                 var server = await disClient.guilds.cache.get(serverID)
-                await serverDB.set(`${serverID}.name`, server.name)
+                if (server) await serverDB.set(`${serverID}.name`, server.name)
             }
 
             allServerData[serverID] = { canBump: false }
@@ -84,7 +84,7 @@ async function checkNew() {
 
         if (isReady) {
             var user = await disClient.users.cache.get(userID)
-            await userDB.set(`${userID}.name`, user.username)
+            if (user) await userDB.set(`${userID}.name`, user.username)
         }
 
         if (await userDB.has(`${userID}.bumpInfo`)) {
