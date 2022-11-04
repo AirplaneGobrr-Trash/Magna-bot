@@ -6,8 +6,14 @@ async function bumpCheck(message){
     if (message.interaction.commandName == "bump" || (message.interaction.commandName == "help" && message.interaction.user.id == "250029754076495874")) {
         message.channel.send(`Thanks for bumping the server! <@${message.interaction.user.id}>`)
         other.log(3, `Bump dected for server: ${message.guildId}`)
-        await other.bumpAdd(message.guildId, message.interaction.user.id)
-        await message.react("👍")
+        try {
+            await other.bumpAdd(message.guildId, message.interaction.user.id)
+            await message.react("👍")
+        } catch (e) {
+            await message.react("⛔")
+            console.log(e)
+        }
+        
     }
 }
 
