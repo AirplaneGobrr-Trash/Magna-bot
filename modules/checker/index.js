@@ -110,7 +110,7 @@ async function checkNew() {
                     if (isReady) {
                         other.log(4, "Client is logged in!")
 
-                        var user = disClient.users.cache.find(user => user.id === userID)
+                        var user = await disClient.users.cache.find(user => user.id === userID)
 
                         if (user) {
                             //await bumpChannel.send(`Bump the server! ${bumpRoleID}`)
