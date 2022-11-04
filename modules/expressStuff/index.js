@@ -53,10 +53,10 @@ async function start(){
     });
 
     app.get("/invite", (req, res) => {
-        res.redirect("https://discord.com/api/oauth2/authorize?client_id=793281470696652821&permissions=76864&scope=bot%20applications.commands")
+        res.redirect("https://discord.com/api/oauth2/authorize?client_id=793281470696652821&permissions=76864&redirect_uri=http%3A%2F%2Fmagna.airplanegobrr.xyz%2FdiscordAuth&response_type=code&scope=bot%20applications.commands%20identify")
     })
     app.get("/inviteAdmin", (req, res) => {
-        res.redirect("https://discord.com/api/oauth2/authorize?client_id=793281470696652821&permissions=8&scope=bot%20applications.commands")
+        res.redirect("https://discord.com/api/oauth2/authorize?client_id=793281470696652821&permissions=8&redirect_uri=http%3A%2F%2Fmagna.airplanegobrr.xyz%2FdiscordAuth&response_type=code&scope=bot%20applications.commands%20identify")
     })
 
     server.listen(3050, () => {
