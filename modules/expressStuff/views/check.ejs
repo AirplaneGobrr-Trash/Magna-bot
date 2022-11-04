@@ -35,9 +35,9 @@
             picker.append(opt)
 
             for (var server in data.data.allServers){
-                console.log(data.data.allServers[server])
+                var serverData = data.data.allServers[server]
                 var opt = document.createElement("option")
-                opt.innerText = server
+                opt.innerText = `${serverData?.name} (${server})`
                 opt.type = "server"
                 picker.append(opt)
             }
@@ -46,11 +46,15 @@
             opt.innerText = "-- Users --"
             picker.append(opt)
             for (var user in data.data.allUsers){
-                console.log(data.data.allUsers[user])
+                var userData = data.data.allUsers[user]
                 var opt = document.createElement("option")
-                opt.innerText = user
+                opt.innerText = `${userData?.name} (${user})`
                 opt.type = "user"
                 picker.append(opt)
+            }
+
+            picker.onchange = (e) =>{
+                console.log(e)
             }
         })
 
