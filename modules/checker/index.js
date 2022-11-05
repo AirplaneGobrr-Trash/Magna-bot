@@ -31,7 +31,8 @@ async function checkNew() {
 
             if (isReady) {
                 var server = await disClient.guilds.cache.get(serverID)
-                if (server) await serverDB.set(`${serverID}.name`, server.name)
+                const name = server.name.replace(/[^a-zA-Z0-9 ]/g, '');
+                if (server) await serverDB.set(`${serverID}.name`, name)
             }
 
             allServerData[serverID] = { canBump: false }
