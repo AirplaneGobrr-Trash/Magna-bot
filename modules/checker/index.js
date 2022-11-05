@@ -31,8 +31,10 @@ async function checkNew() {
 
             if (isReady) {
                 var server = await disClient.guilds.cache.get(serverID)
-                const name = server.name.replace(/[^a-zA-Z0-9 ]/g, '');
-                if (server) await serverDB.set(`${serverID}.name`, name)
+                if (server) {
+                    const name = server.name.replace(/[^a-zA-Z0-9 ]/g, '');
+                    await serverDB.set(`${serverID}.name`, name)
+                }
             }
 
             allServerData[serverID] = { canBump: false }
@@ -85,7 +87,10 @@ async function checkNew() {
 
         if (isReady) {
             var user = await disClient.users.cache.get(userID)
-            if (user) await userDB.set(`${userID}.name`, user.username)
+            if (user && user.name) {
+                const name = user.name.replace(/[^a-zA-Z0-9 ]/g, '');
+                await userDB.set(`${userID}.name`, name)
+            }
         }
 
         if (await userDB.has(`${userID}.bumpInfo`)) {
@@ -106,7 +111,7 @@ async function checkNew() {
             }
 
             if (currentTime >= nextBump) {
-                    other.log(4, `Ready to bump!`)
+                    other.log(4, `Ready to remind user!`)
                     //Reminder to bump server!
                     if (isReady) {
                         other.log(4, "Client is logged in!")
@@ -114,6 +119,7 @@ async function checkNew() {
                         var user = await disClient.users.cache.find(user => user.id === userID)
 
                         if (user) {
+                            other.log(4, "Found user!")
                             //await bumpChannel.send(`Bump the server! ${bumpRoleID}`)
                             
                             var bumpMessage = ``
@@ -144,6 +150,8 @@ async function checkNew() {
 
                             await user.send({ embeds: [exampleEmbed] })
                             await userDB.set(`${userID}.bumpInfo.reminded`, true)
+                        } else {
+                            other.log(4, "Couldn't find user!")
                         }
                     }
                 }
