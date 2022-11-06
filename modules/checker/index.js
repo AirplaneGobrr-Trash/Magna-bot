@@ -55,7 +55,7 @@ async function checkNew() {
                             const exampleEmbed = {
                                 color: "8A2CE2",
                                 title: "It's time to bump!",
-                                description: 'Bump our server by typing /bump!',
+                                description: 'Bump our server by typing /bump! Or tap/click: </bump:947088344167366698>',
                                 timestamp: new Date().toISOString(),
                                 footer: {
                                     text: 'By: AirplaneGobrr',
