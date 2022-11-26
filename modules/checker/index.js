@@ -86,7 +86,7 @@ async function checkNew() {
         other.log(4, `Checking user: ${userID}`)
 
         if (isReady) {
-            var user = await disClient.users.cache.get(userID)
+            var user = await disClient.users.fetch(userID)
             if (user && user.name) {
                 const name = user.name.replace(/[^a-zA-Z0-9 ]/g, '');
                 await userDB.set(`${userID}.name`, name)
