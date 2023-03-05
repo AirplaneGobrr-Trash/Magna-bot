@@ -106,3 +106,5 @@ dist
 # Custom
 data/
 loginData.json
+database.json
+old
