@@ -1,5 +1,5 @@
 const fs = require("fs")
-const wall = "🌫️" // 🌫️
+const wall = "🧱" // 🌫️
 const player = "🏃"
 const box = "🛒"
 const goal = "🟩"
@@ -13,15 +13,12 @@ class sokoban {
         this.currentPlayerPOS = null
         this.blockPlrIsOn = null
         this.game = {
-            wall:{
-                "0,0": temp
-            },
-            player:{
-
-            },
-            blocks:{
-
-            }
+            // Walls
+            wall:{},
+            // Only should be one
+            player:{},
+            // Goals/Box
+            blocks:{}
         }
     }
     loadGame(json){
@@ -34,38 +31,60 @@ class sokoban {
     saveGame(){
         fs.writeFileSync("game.json", JSON.stringify(this))
     }
+    getCords(cordString){
+        let spl = cordString.split(",")
+        return {
+            x:spl[0],
+            y:spl[1]
+        }
+    }
     gameToString() {
-        let gameRender = ""
-        for (var e of this.game) {
-            for (var block of e) {
-                gameRender += `${block}`
+        console.log(this.game)
+        let game = []
+        for (var y = 0; y < this.height; y++) {
+            game[y] = []
+            for (var x = 0; x < this.width; x++) {
+                game[y][x] = temp
             }
-            gameRender += "\n"
+        }
+        
+        let gameRender = ""
+        // TODO: We should be doing it in this order:
+        // Goals, Player, Walls
+        // Walls will always be on top, we should also run a check to check if that space is already taken
+        // If so we check whats going on, there is no fixing it at this stage but its nice to know
+        for (var type in this.game){
+            for (var data in this.game[type]){
+                var cords = this.getCords(data)
+                game[cords.y][cords.x] = this.game[type][data]
+            }
+        }
+
+        for (var row of game){
+            gameRender+=`${row.join("")}\n`
         }
         console.log(gameRender)
-        // fs.writeFileSync("game.txt", gameRender)
+        fs.writeFileSync("game.txt", gameRender)
         return gameRender
     
     }
     
     genWalls() {
-        for (var row in this.game) {
-            if (row == 0) {
-                for (var block in this.game[row]) {
-                    this.game[row][block] = wall
-                }
-            } else if (row == this.game.length - 1) {
-                for (var block in this.game[row]) {
-                    this.game[row][block] = wall
-                }
-            } else {
-                for (var block in this.game[row]) {
-                    this.game[row][0] = wall
-                    this.game[row][this.game[row].length - 1] = wall
-                }
-            }
+        // I spent forever trying to debug this,
+        // This NEEDS to do -1 as it ropos the pos soo.. yea.
+        // Arrays start at 0 in the loop, so we -1 from the X || Y to fix it,
+        for (let x = 0; x < this.width; x++) {
+            // Adds top
+            this.game.wall[`${x},0`] = wall
+            // Add bottem
+            this.game.wall[`${x},${this.height-1}`] = wall
         }
-        // console.log(game)
+        for (let y = 0; y < this.height; y++) {
+            // Add Left wall
+            this.game.wall[`0,${y}`] = wall
+            // Add Right wall
+            this.game.wall[`${this.width-1},${y}`] = wall
+        }
         return
     }
     
@@ -85,10 +104,10 @@ class sokoban {
             let sub = null
             if (plrIn) sub = 2; else sub = 4
             let out = {
-                x: Math.floor(Math.random() * (this.width - sub)) + sub / 2,
+                x: Math.floor(Math.random() * (this.width - sub - 1)) + sub / 2,
                 y: Math.floor(Math.random() * (this.height - sub)) + sub / 2
             }
-            // console.log(out, sub)
+            // console.log(this.height - sub, sub / 2, out)
             return out
         }
     
@@ -99,38 +118,42 @@ class sokoban {
         var blocks = blockCount + 1
         for (let i = 0; i < blocks; i++) {
             var pos1 = await this.getRPOS(false, invaild)
-            // console.log(goal, pos1)
-            this.game[pos1.y][pos1.x] = goal
+            console.log(goal, pos1)
+            if (this.game.blocks[`${pos1.x},${pos1.y}`]) console.log("WARN", this.game.blocks[`${pos1.x},${pos1.y}`])
+            this.game.blocks[`${pos1.x},${pos1.y}`] = goal
             invaild.push(pos1)
         }
         for (var i = 0; i < blocks; i++) {
     
             var pos2 = await this.getRPOS(false, invaild)
-            // console.log(box, pos2)
-            this.game[pos2.y][pos2.x] = box
+            console.log(box, pos2)
+            if (this.game.blocks[`${pos1.x},${pos1.y}`]) console.log("WARN", this.game.blocks[`${pos1.x},${pos1.y}`])
+            this.game.blocks[`${pos1.x},${pos1.y}`] = box
             invaild.push(pos2)
         }
         let playerPOS = await this.getRPOS(true, invaild)
-        // console.log(player, playerPOS)
-        this.blockPlrIsOn = this.game[playerPOS.y][playerPOS.x]
-        this.game[playerPOS.y][playerPOS.x] = player
+        console.log(player, playerPOS)
+        // this.blockPlrIsOn = this.game[playerPOS.y][playerPOS.x]
+        this.game.player[`${playerPOS.x},${playerPOS.y}`] = player
         this.currentPlayerPOS = playerPOS
         // console.log(game)
         return
     }
     
     async gen(level) {
-        this.game = []
-        for (let i = 0; i < this.height + level; i++) {
-            let tmp = []
-            for (let ii = 0; ii < this.width + level; ii++) {
-                tmp.push(temp)
+        this.game = {
+            wall:{
+            },
+            player:{
+
+            },
+            blocks:{
+
             }
-            this.game.push(tmp)
         }
-        this.genWalls()
+        await this.genWalls()
         await this.genBlocks(level)
-        this.gameToString()
+        await this.gameToString()
     }
     movePlayer(dy, dx) {
         const y = this.currentPlayerPOS.y + dy;
