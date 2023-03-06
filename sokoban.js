@@ -39,7 +39,7 @@ class sokoban {
         }
     }
     gameToString() {
-        console.log(this.game)
+        // console.log(this.game)
         let game = []
         for (var y = 0; y < this.height; y++) {
             game[y] = []
@@ -63,7 +63,7 @@ class sokoban {
         for (var row of game){
             gameRender+=`${row.join("")}\n`
         }
-        console.log(gameRender)
+        // console.log(gameRender)
         fs.writeFileSync("game.txt", gameRender)
         return gameRender
     
@@ -88,51 +88,64 @@ class sokoban {
         return
     }
     
-    async getRPOS(plrIn, __invaild) {
-        if (__invaild) {
-            let posIn = await this.getRPOS(plrIn)
-            let pass = true
-            for (var pos of __invaild) {
-                if (pos.x == posIn.x && pos.y == posIn.y) {
+    async getRPOS(plrIn, invaild) {
+        let sub = null
+        if (plrIn) sub = 2; else sub = 4
+        let out = {
+            x: Math.floor(Math.random() * (this.width - sub)) + sub / 2,
+            y: Math.floor(Math.random() * (this.height - sub)) + sub / 2
+        }
+    
+        // Check if the generated position is in the invaild array
+        if (invaild) {
+            var pass = true
+            for (var pos of invaild) {
+                if (pos.x == out.x && pos.y == out.y) {
+                    // The generated position is invalid, generate a new one
                     pass = false
                 }
             }
-            if (pass) return posIn; else {
-                return await this.getRPOS(plrIn, __invaild)
-            }
-        } else {
-            let sub = null
-            if (plrIn) sub = 2; else sub = 4
-            let out = {
-                x: Math.floor(Math.random() * (this.width - sub - 1)) + sub / 2,
-                y: Math.floor(Math.random() * (this.height - sub)) + sub / 2
-            }
-            // console.log(this.height - sub, sub / 2, out)
-            return out
+            if (!pass) return await this.getRPOS(plrIn, invaild)
         }
     
+        return out
     }
     
     async genBlocks(blockCount) {
         let invaild = []
         var blocks = blockCount + 1
+    
+        // Generate positions for the goals
         for (let i = 0; i < blocks; i++) {
             var pos1 = await this.getRPOS(false, invaild)
-            console.log(goal, pos1)
-            if (this.game.blocks[`${pos1.x},${pos1.y}`]) console.log("WARN", this.game.blocks[`${pos1.x},${pos1.y}`])
+            // console.log(goal, pos1)
+    
+            // Check if the position is already occupied
+            if (this.game.blocks[`${pos1.x},${pos1.y}`]) {
+                console.log("WARN", this.game.blocks[`${pos1.x},${pos1.y}`])
+            }
+    
+            // Place the block at the position
             this.game.blocks[`${pos1.x},${pos1.y}`] = goal
             invaild.push(pos1)
         }
-        for (var i = 0; i < blocks; i++) {
     
+        // Generate positions for the boxes
+        for (var i = 0; i < blocks; i++) {
             var pos2 = await this.getRPOS(false, invaild)
-            console.log(box, pos2)
-            if (this.game.blocks[`${pos1.x},${pos1.y}`]) console.log("WARN", this.game.blocks[`${pos1.x},${pos1.y}`])
-            this.game.blocks[`${pos1.x},${pos1.y}`] = box
+            // console.log(box, pos2)
+    
+            // Check if the position is already occupied
+            if (this.game.blocks[`${pos2.x},${pos2.y}`]) {
+                console.log("WARN", this.game.blocks[`${pos2.x},${pos2.y}`])
+            }
+    
+            // Place the block at the position
+            this.game.blocks[`${pos2.x},${pos2.y}`] = box
             invaild.push(pos2)
         }
         let playerPOS = await this.getRPOS(true, invaild)
-        console.log(player, playerPOS)
+        //console.log(player, playerPOS)
         // this.blockPlrIsOn = this.game[playerPOS.y][playerPOS.x]
         this.game.player[`${playerPOS.x},${playerPOS.y}`] = player
         this.currentPlayerPOS = playerPOS
@@ -151,58 +164,62 @@ class sokoban {
 
             }
         }
-        await this.genWalls()
+        this.genWalls()
         await this.genBlocks(level)
-        await this.gameToString()
+        this.gameToString()
     }
     movePlayer(dy, dx) {
         const y = this.currentPlayerPOS.y + dy;
         const x = this.currentPlayerPOS.x + dx;
         let doneMove = false
+
+        let gotoWallcheck = this.game.wall[`${x},${y}`]
+        let gotoBlockCheck = this.game.blocks[`${x},${y}`]
     
-        switch (this.game[y][x]) {
-            case wall:{
-                doneMove = true
-                break
-            }
-            case win:{
-                doneMove = true
-                break
-            }
-            case box: {
-                if (!doneMove) {
-                    const y2 = y+dy
-                    const x2 = x+dx
-                    if (this.game[y2][x2] == goal) {
-                        //console.log(y,x,y2,x2)
-                        this.game[y2][x2] = win
-                        this.game[this.currentPlayerPOS.y][this.currentPlayerPOS.x] = this.blockPlrIsOn
-                        this.game[y][x] = player;
-                        this.currentPlayerPOS = { x, y };
-                        this.blockPlrIsOn = temp
-                        doneMove = true
-                    } else if (this.game[y2][x2] != wall || this.game[y2][x2] != box){
-                        //console.log(y,x,y2,x2)
-                        this.game[y2][x2] = box
-                        this.game[this.currentPlayerPOS.y][this.currentPlayerPOS.x] = this.blockPlrIsOn
-                        this.game[y][x] = player;
-                        this.currentPlayerPOS = { x, y };
-                        this.blockPlrIsOn = temp
-                        doneMove = true
-                    }
+        if (gotoWallcheck) {
+            doneMove = true
+        }
+        if (gotoBlockCheck) {
+            switch (gotoBlockCheck) {
+                case win:{
+                    doneMove = true
+                    break
                 }
-    
-                break
+                case box: {
+                    if (!doneMove) {
+                        const y2 = y+dy
+                        const x2 = x+dx
+                        if (this.game.blocks[`${x},${y}`] == box) {
+                            delete this.game.player[`${this.currentPlayerPOS.x},${this.currentPlayerPOS.y}`]
+                            delete this.game.blocks[`${x},${y}`]
+                            delete this.game.blocks[`${this.currentPlayerPOS.x},${this.currentPlayerPOS.y}`]
+                            //console.log(y,x,y2,x2)
+                            this.game.blocks[`${x2},${y2}`] = win
+                            this.game.player[`${x},${y}`] = player;
+                            this.currentPlayerPOS = { x, y };
+                            doneMove = true
+                        } else if (this.game.blocks[`${x},${y}`] != wall || this.game.blocks[`${x},${y}`] != box){
+                            delete this.game.player[`${this.currentPlayerPOS.x},${this.currentPlayerPOS.y}`]
+                            delete this.game.blocks[`${x},${y}`]
+                            //console.log(y,x,y2,x2)
+                            this.game.blocks[`${x2},${y2}`] = box
+                            this.game.player[`${x},${y}`] = player;
+                            this.currentPlayerPOS = { x, y };
+                            doneMove = true
+                        }
+                    }
+        
+                    break
+                }
             }
-            default:{
-                if (doneMove) break
-                let e = this.game[y][x]
-                this.game[y][x] = player;
-                this.game[this.currentPlayerPOS.y][this.currentPlayerPOS.x] = this.blockPlrIsOn;
-                this.blockPlrIsOn = e
-                this.currentPlayerPOS = { x, y };
-                break
-            }
+        }
+        
+        // [`${x},${y}`]
+
+        if (!doneMove) {
+            delete this.game.player[`${this.currentPlayerPOS.x},${this.currentPlayerPOS.y}`] 
+            this.game.player[`${x},${y}`] = player;
+            this.currentPlayerPOS = { x, y };
         }
     }
     
