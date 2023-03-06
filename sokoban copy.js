@@ -12,17 +12,7 @@ class sokoban {
         this.height = height
         this.currentPlayerPOS = null
         this.blockPlrIsOn = null
-        this.game = {
-            wall:{
-                "0,0": temp
-            },
-            player:{
-
-            },
-            blocks:{
-
-            }
-        }
+        this.game = []
     }
     loadGame(json){
         this.width = json.width
