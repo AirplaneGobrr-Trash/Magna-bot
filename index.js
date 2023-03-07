@@ -1,19 +1,3 @@
-const fs = require("fs")
-const newSodo = require("./sokoban")
-const game = new newSodo()
+const eris = require("eris")
+const bot = eris("NzkzMjgxNDcwNjk2NjUyODIx.Gy5mgs.zmIcUscRGurOKMFwedwknj4SUwVWAyThFG9goc")
 
-async function create(){
-    await game.gen(4)
-    
-}
-async function load(){
-    game.loadGame((require("./game.json")))
-}
-async function main(){
-    // await create()
-    await load()
-    game.movePlayerLeft()
-    console.log(game.gameToString())
-    await game.saveGame()
-}
-main()
