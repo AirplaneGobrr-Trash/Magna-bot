@@ -7,7 +7,7 @@ const temp = "⬛"
 const win = "✅"
 
 class sokoban {
-    constructor(width = 9, height = 6){
+    constructor(width = 9, height = 6, debug = false){
         this.width = width
         this.height = height
         this.currentPlayerPOS = null
@@ -169,8 +169,10 @@ class sokoban {
         this.gameToString()
     }
     movePlayer(dy, dx) {
+        console.log(`Move: ${dy} ${dx}`)
         const y = this.currentPlayerPOS.y + dy;
         const x = this.currentPlayerPOS.x + dx;
+        console.log(`New pos: ${y} ${x}`)
         let doneMove = false
 
         let gotoWallcheck = this.game.wall[`${x},${y}`]
@@ -189,7 +191,9 @@ class sokoban {
                     if (!doneMove) {
                         const y2 = y+dy
                         const x2 = x+dx
+                        console.log(`2 blocks infront: ${y2} ${x2}`)
                         if (this.game.blocks[`${x},${y}`] == box) {
+                            console.log(`Win`)
                             delete this.game.player[`${this.currentPlayerPOS.x},${this.currentPlayerPOS.y}`]
                             delete this.game.blocks[`${x},${y}`]
                             delete this.game.blocks[`${this.currentPlayerPOS.x},${this.currentPlayerPOS.y}`]
@@ -199,6 +203,7 @@ class sokoban {
                             this.currentPlayerPOS = { x, y };
                             doneMove = true
                         } else if (this.game.blocks[`${x},${y}`] != wall || this.game.blocks[`${x},${y}`] != box){
+                            console.log(`Move block`)
                             delete this.game.player[`${this.currentPlayerPOS.x},${this.currentPlayerPOS.y}`]
                             delete this.game.blocks[`${x},${y}`]
                             //console.log(y,x,y2,x2)
@@ -209,6 +214,11 @@ class sokoban {
                         }
                     }
         
+                    break
+                }
+
+                case goal: {
+                    doneMove = true
                     break
                 }
             }
