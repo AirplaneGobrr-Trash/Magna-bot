@@ -7,18 +7,24 @@ const temp = "⬛"
 const win = "✅"
 
 class sokoban {
-    constructor(width = 9, height = 6, debug = false){
+    constructor(width = 9, height = 6, gameData = null, debug = false){
         this.width = width
         this.height = height
-        this.currentPlayerPOS = null
-        this.blockPlrIsOn = null
-        this.game = {
-            // Walls
-            wall:{},
-            // Only should be one
-            player:{},
-            // Goals/Box
-            blocks:{}
+        if (gameData) {
+            this.currentPlayerPOS = gameData.currentPlayerPOS
+            this.blockPlrIsOn = gameData.blockPlrIsOn
+            this.game = gameData.game
+        } else {
+            this.currentPlayerPOS = null
+            this.blockPlrIsOn = null
+            this.game = {
+                // Walls
+                wall:{},
+                // Only should be one
+                player:{},
+                // Goals/Box
+                blocks:{}
+            }
         }
     }
     loadGame(json){
@@ -27,6 +33,10 @@ class sokoban {
         this.currentPlayerPOS = json.currentPlayerPOS
         this.blockPlrIsOn = json.blockPlrIsOn
         this.game = json.game
+    }
+    exportGame(){
+        // This makes it so we are only getting the raw data, no extra functions or anything
+        return JSON.parse(JSON.stringify(this))
     }
     saveGame(){
         fs.writeFileSync("game.json", JSON.stringify(this))
@@ -53,7 +63,8 @@ class sokoban {
         // Goals, Player, Walls
         // Walls will always be on top, we should also run a check to check if that space is already taken
         // If so we check whats going on, there is no fixing it at this stage but its nice to know
-        for (var type in this.game){
+        var types = ["wall", "blocks", "player"]
+        for (var type of types){
             for (var data in this.game[type]){
                 var cords = this.getCords(data)
                 game[cords.y][cords.x] = this.game[type][data]
