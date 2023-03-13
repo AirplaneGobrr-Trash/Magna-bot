@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@airplanegobrr/database": "^1.0.5",
     "eris": "^0.17.1"
   }
 }

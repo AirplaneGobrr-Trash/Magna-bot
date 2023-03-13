@@ -6,15 +6,25 @@ const goal = "🟩"
 const temp = "⬛"
 const win = "✅"
 
+// level 0 9x6
+// Level 1 11x7
+
+// Dif: +2, +1
+
 class sokoban {
     constructor(width = 9, height = 6, gameData = null, debug = false){
-        this.width = width
-        this.height = height
+        
         if (gameData) {
+            // console.log(gameData)
+            this.width = gameData.width
+            this.height = gameData.height
             this.currentPlayerPOS = gameData.currentPlayerPOS
             this.blockPlrIsOn = gameData.blockPlrIsOn
             this.game = gameData.game
+            this.level = gameData.level
         } else {
+            this.width = width
+            this.height = height
             this.currentPlayerPOS = null
             this.blockPlrIsOn = null
             this.game = {
@@ -25,6 +35,7 @@ class sokoban {
                 // Goals/Box
                 blocks:{}
             }
+            this.level = null
         }
     }
     loadGame(json){
@@ -175,10 +186,21 @@ class sokoban {
 
             }
         }
+        this.level = level
         this.genWalls()
         await this.genBlocks(level)
         this.gameToString()
     }
+
+    checkWin(){
+        var won = true
+        for (var block in this.game.blocks) {
+            // console.log(this.game.blocks[block])
+            if (this.game.blocks[block] != win) won = false
+        }
+        return won
+    }
+
     movePlayer(dy, dx) {
         console.log(`Move: ${dy} ${dx}`)
         const y = this.currentPlayerPOS.y + dy;
@@ -203,7 +225,7 @@ class sokoban {
                         const y2 = y+dy
                         const x2 = x+dx
                         console.log(`2 blocks infront: ${y2} ${x2}`)
-                        if (this.game.blocks[`${x},${y}`] == box) {
+                        if (this.game.blocks[`${x2},${y2}`] == goal) {
                             console.log(`Win`)
                             delete this.game.player[`${this.currentPlayerPOS.x},${this.currentPlayerPOS.y}`]
                             delete this.game.blocks[`${x},${y}`]

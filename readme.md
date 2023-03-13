@@ -4,6 +4,10 @@ This is Magna bot!
 
 "Magna" is Latin for "Great" (Aka Great bot)
 
+# Invite
+
+[Admin](https://discord.com/api/oauth2/authorize?client_id=793281470696652821&permissions=8&scope=bot%20applications.commands)
+
 # Todo
 
 ### List
