@@ -14,11 +14,13 @@ This is Magna bot!
 
 - [ ] Recode base of Magna (VH)
 - [ ] Bump reminder (M)
+  - [ ] Perbot
+  - [x] Base
 - [ ] Ticket System (L)
 - [ ] Pin System (L)
 - [ ] Games 
   - [ ] Chess (H)
-  - [ ] Sakodan (H)
+  - [x] Sakoban (H)
 - [ ] Ecom (VL)
   - [ ] Global Ecom
   - [ ] Server Ecom
