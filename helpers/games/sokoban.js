@@ -224,7 +224,9 @@ class sokoban {
                     if (!doneMove) {
                         const y2 = y+dy
                         const x2 = x+dx
-                        console.log(`2 blocks infront: ${y2} ${x2}`)
+                        console.log(`2 blocks infront: ${y2} ${x2} ${this.game.blocks[`${x2},${y2}`] ?? this.game.wall[`${x2},${y2}`]}`)
+                        console.log(this.game.wall[`${x2},${y2}`] != wall || this.game.blocks[`${x2},${y2}`] != box)
+                        console.log(this.game.wall[`${x2},${y2}`] != wall, this.game.blocks[`${x2},${y2}`] != box)
                         if (this.game.blocks[`${x2},${y2}`] == goal) {
                             console.log(`Win`)
                             delete this.game.player[`${this.currentPlayerPOS.x},${this.currentPlayerPOS.y}`]
@@ -235,7 +237,7 @@ class sokoban {
                             this.game.player[`${x},${y}`] = player;
                             this.currentPlayerPOS = { x, y };
                             doneMove = true
-                        } else if (this.game.blocks[`${x},${y}`] != wall || this.game.blocks[`${x},${y}`] != box){
+                        } else if (this.game.wall[`${x2},${y2}`] !== wall && this.game.blocks[`${x2},${y2}`] !== box ){
                             console.log(`Move block`)
                             delete this.game.player[`${this.currentPlayerPOS.x},${this.currentPlayerPOS.y}`]
                             delete this.game.blocks[`${x},${y}`]
