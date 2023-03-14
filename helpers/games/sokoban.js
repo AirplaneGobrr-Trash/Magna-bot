@@ -6,19 +6,36 @@ const goal = "🟩"
 const temp = "⬛"
 const win = "✅"
 
+// level 0 9x6
+// Level 1 11x7
+
+// Dif: +2, +1
+
 class sokoban {
-    constructor(width = 9, height = 6, debug = false){
-        this.width = width
-        this.height = height
-        this.currentPlayerPOS = null
-        this.blockPlrIsOn = null
-        this.game = {
-            // Walls
-            wall:{},
-            // Only should be one
-            player:{},
-            // Goals/Box
-            blocks:{}
+    constructor(width = 9, height = 6, gameData = null, debug = false){
+        
+        if (gameData) {
+            // console.log(gameData)
+            this.width = gameData.width
+            this.height = gameData.height
+            this.currentPlayerPOS = gameData.currentPlayerPOS
+            this.blockPlrIsOn = gameData.blockPlrIsOn
+            this.game = gameData.game
+            this.level = gameData.level
+        } else {
+            this.width = width
+            this.height = height
+            this.currentPlayerPOS = null
+            this.blockPlrIsOn = null
+            this.game = {
+                // Walls
+                wall:{},
+                // Only should be one
+                player:{},
+                // Goals/Box
+                blocks:{}
+            }
+            this.level = null
         }
     }
     loadGame(json){
@@ -27,6 +44,10 @@ class sokoban {
         this.currentPlayerPOS = json.currentPlayerPOS
         this.blockPlrIsOn = json.blockPlrIsOn
         this.game = json.game
+    }
+    exportGame(){
+        // This makes it so we are only getting the raw data, no extra functions or anything
+        return JSON.parse(JSON.stringify(this))
     }
     saveGame(){
         fs.writeFileSync("game.json", JSON.stringify(this))
@@ -53,7 +74,8 @@ class sokoban {
         // Goals, Player, Walls
         // Walls will always be on top, we should also run a check to check if that space is already taken
         // If so we check whats going on, there is no fixing it at this stage but its nice to know
-        for (var type in this.game){
+        var types = ["wall", "blocks", "player"]
+        for (var type of types){
             for (var data in this.game[type]){
                 var cords = this.getCords(data)
                 game[cords.y][cords.x] = this.game[type][data]
@@ -164,10 +186,21 @@ class sokoban {
 
             }
         }
+        this.level = level
         this.genWalls()
         await this.genBlocks(level)
         this.gameToString()
     }
+
+    checkWin(){
+        var won = true
+        for (var block in this.game.blocks) {
+            // console.log(this.game.blocks[block])
+            if (this.game.blocks[block] != win) won = false
+        }
+        return won
+    }
+
     movePlayer(dy, dx) {
         console.log(`Move: ${dy} ${dx}`)
         const y = this.currentPlayerPOS.y + dy;
@@ -191,8 +224,10 @@ class sokoban {
                     if (!doneMove) {
                         const y2 = y+dy
                         const x2 = x+dx
-                        console.log(`2 blocks infront: ${y2} ${x2}`)
-                        if (this.game.blocks[`${x},${y}`] == box) {
+                        console.log(`2 blocks infront: ${y2} ${x2} ${this.game.blocks[`${x2},${y2}`] ?? this.game.wall[`${x2},${y2}`]}`)
+                        console.log(this.game.wall[`${x2},${y2}`] != wall || this.game.blocks[`${x2},${y2}`] != box)
+                        console.log(this.game.wall[`${x2},${y2}`] != wall, this.game.blocks[`${x2},${y2}`] != box)
+                        if (this.game.blocks[`${x2},${y2}`] == goal) {
                             console.log(`Win`)
                             delete this.game.player[`${this.currentPlayerPOS.x},${this.currentPlayerPOS.y}`]
                             delete this.game.blocks[`${x},${y}`]
@@ -202,7 +237,7 @@ class sokoban {
                             this.game.player[`${x},${y}`] = player;
                             this.currentPlayerPOS = { x, y };
                             doneMove = true
-                        } else if (this.game.blocks[`${x},${y}`] != wall || this.game.blocks[`${x},${y}`] != box){
+                        } else if (this.game.wall[`${x2},${y2}`] !== wall && this.game.blocks[`${x2},${y2}`] !== box ){
                             console.log(`Move block`)
                             delete this.game.player[`${this.currentPlayerPOS.x},${this.currentPlayerPOS.y}`]
                             delete this.game.blocks[`${x},${y}`]

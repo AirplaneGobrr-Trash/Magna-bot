@@ -108,4 +108,4 @@ data/
 loginData.json
 database.json
 old
-game.*
+data/*

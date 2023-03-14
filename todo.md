@@ -1,7 +1,0 @@
-- [ ] Recode base of Magna (M)
-- [ ] Bump reminder (M)
-- [ ] Ticket System (L)
-- [ ] Pin System (L)
-- [ ] Games
-  - [ ] Chess
-  - [ ] Sakoden

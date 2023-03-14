@@ -1,13 +1,16 @@
 const eris = require("eris")
 const bot = eris("NzkzMjgxNDcwNjk2NjUyODIx.Gy5mgs.zmIcUscRGurOKMFwedwknj4SUwVWAyThFG9goc")
+const fs = require("fs")
 
-bot.on("ready", ()=>{
-    console.log(bot.user)
-    bot.editStatus({
-        name: "coding changes",
-        type: 1,
-        url: "https://twitch.tv/airplanegobrr_streams"
-    })
-})
+const eventsDir = fs.readdirSync("./events").filter(e => e.endsWith(".js"))
+for (var eventFName of eventsDir) {
+    const event = require(`./events/${eventFName}`)
+    if (event.once) {
+        bot.once(event.name, (...args) => event.execute(...args, bot));
+    } else {
+        bot.on(event.name, (...args) => event.execute(...args, bot));
+    }
+}
+
 
 bot.connect()
