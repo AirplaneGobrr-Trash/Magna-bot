@@ -1,13 +1,14 @@
-const eris = require("eris");
+const discord = require("discord.js");
 const fs = require("fs")
 const utils = require("../helpers/utils")
+const config = require("../config.json")
 
 module.exports = {
-    name: "ready",
+    name: discord.Events.ClientReady,
     once: true,
     /**
      * 
-     * @param {eris.Client} bot 
+     * @param {discord.Client} bot 
      */
     async execute(bot) {
         // console.log(bot)
@@ -17,15 +18,16 @@ module.exports = {
         let loadedCommands = new Map()
 
         console.log("Ready!")
-        bot.editStatus({
+        bot.user.setActivity({
             name: "coding changes",
             type: 1,
             url: "https://twitch.tv/airplanegobrr_streams"
         })
 
-        commands = await bot.getCommands()
+        commands = await bot.application.commands.fetch()
         // console.log(commands)
 
+        var commandsUpdate = []
         for (var commandType of commandTypes) {
             const commandFiles = fs.readdirSync(`./commands/${commandType}`)
             for (var commandFile of commandFiles) {
@@ -34,19 +36,26 @@ module.exports = {
 
                 loadedCommands.set(commandD.name, commandData)
 
-                let foundName = commands.find(e => e.name == commandD.name)
-                let foundDes = commands.find(e => e.description == commandD.description)
-
-                let update = !foundDes || !foundName || commandData?.alwaysUpdate
-
-                console.log(`Should update command "${commandD.name}" ${update}`)
-                if (update) {
-                    // console.log(`Updated "${commandD.name}"`)
-                    await bot.createCommand(commandD)
-                } else {
-                }
+                commandsUpdate.push(commandD)
             }
-        } 
+        }
+        const rest = new discord.REST({ version: '10' }).setToken(config.token);
+
+        try {
+            console.log(`Started refreshing ${commands.length} application (/) commands.`);
+    
+            // The put method is used to fully refresh all commands in the guild with the current set
+            const data = await rest.put(
+                discord.Routes.applicationCommands(bot.user.id),
+                { body: commandsUpdate },
+            );
+    
+            console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+        } catch (error) {
+            // And of course, make sure you catch and log any errors!
+            console.error(error);
+        }
+
 
         bot.loadedCommands = loadedCommands
         var pause = false

@@ -45,7 +45,7 @@ class Chess {
         await this.checkImage()
         const array = [];
         var board = this.game.board()
-        console.log(board, images)
+        // console.log(board, images)
         for (let row in board) {
             for (let piece in board[row]) {
                 let pData = board[row][piece]
@@ -85,7 +85,7 @@ class Chess {
         }
 
         array.forEach((piece) => {
-            console.log(piece, images[piece.color][piece.type])
+            // console.log(piece, images[piece.color][piece.type])
             const pieceSize = CELL_SIZE * 1; // Not needed, Leaving it just incase!
             const offset = (CELL_SIZE - pieceSize) / 2;
             ctx.drawImage(images[piece.color][piece.type], piece.x * CELL_SIZE + offset, piece.y * CELL_SIZE + offset, pieceSize, pieceSize);
@@ -105,6 +105,6 @@ module.exports = {
 
 async function test(){
     const game = new Chess()
-    console.log(await game.render())
+    // console.log(await game.render())
 }
-test()
+// test()

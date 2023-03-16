@@ -1,15 +1,15 @@
-const eris = require("eris");
+const discord = require("discord.js");
 
 module.exports = {
-    name: "interactionCreate",
+    name: discord.Events.InteractionCreate,
     /**
      * 
-     * @param {eris.Interaction} interaction
-     * @param {eris.Client} bot 
+     * @param {discord.Interaction} interaction
+     * @param {discord.Client} bot 
      */
     async execute(interaction, bot){
         console.log(interaction)
-        if (interaction instanceof eris.CommandInteraction) {
+        if (interaction instanceof discord.CommandInteraction) {
             let commandName = interaction.data.name
             let command = bot.loadedCommands.get(commandName)
             if (command) {

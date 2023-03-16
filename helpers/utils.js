@@ -1,5 +1,5 @@
 const dbClass = require("@airplanegobrr/database");
-const Eris = require("eris");
+const discord = require("discord.js");
 const fs = require("fs")
 
 function generateUUID() {
@@ -46,7 +46,7 @@ async function bAdd(serverID, bumpID, userID) {
 
 /**
  * 
- * @param {Eris.Client} client 
+ * @param {discord.Client} client 
  */
 async function bCheck(client) {
     console.log("Running bump check!")
@@ -68,11 +68,13 @@ async function bCheck(client) {
                 // bumpRole
                 var bumpRoleID = ""
                 if (bumpInfo?.bumpRole) bumpRoleID = `<@&${bumpInfo?.bumpRole}>`; else bumpRoleID = "No Bump role set!"
-                if (bumpInfo?.bumpChannel) var bumpChannel = client.getChannel(bumpInfo?.bumpChannel)
+                if (bumpInfo?.bumpChannel) var bumpChannel = await client.channels.fetch(bumpInfo?.bumpChannel)
+                
                 console.log(bumpInfo?.bumpChannel)
                 if (!bumpChannel) continue
-                bumpChannel.createMessage({
-                    embed: {
+                bumpChannel.send({
+                    
+                    embeds: [{
                         title: "It's time to bump!",
                         description: 'Bump our server by typing /bump! Or tap/click: </bump:947088344167366698>',
                         timestamp: new Date().toISOString(),
@@ -80,7 +82,7 @@ async function bCheck(client) {
                             text: 'By: AirplaneGobrr',
                             icon_url: 'https://cdn.discordapp.com/avatars/250029754076495874/d3d522482f97c0c69f826206d04070b1.webp?size=40',
                         },
-                    },
+                    }],
                     content: `${bumpRoleID}`
                 })
                 await serverDB.set(`bumpInfo.nextBumpReminder`, currentTime + 900000)
@@ -106,7 +108,7 @@ async function bCheck(client) {
         if (!bumpInfo.nextBump) bumpInfo.nextBump = 0
 
         if (currentTime >= bumpInfo?.nextBump) {
-            var user = client.users.get(userID.replace(".json", ""))
+            var user = await client.users.fetch(userID.replace(".json", ""))
             console.log(user)
             if (!user) continue
             var bumpMessage = ``
@@ -122,9 +124,8 @@ async function bCheck(client) {
                     }
                 }
             }
-            var userDM = await user.getDMChannel()
-            userDM.createMessage({
-                embed: {
+            await user.send({
+                embeds: [{
                     title: "You can now bump a server again!",
                     description: `Servers: ${bumpMessage}`,
                     timestamp: new Date().toISOString(),
@@ -132,7 +133,7 @@ async function bCheck(client) {
                         text: 'By: AirplaneGobrr',
                         icon_url: 'https://cdn.discordapp.com/avatars/250029754076495874/d3d522482f97c0c69f826206d04070b1.webp?size=40',
                     },
-                }
+                }]
             })
             await userDB.set(`bumpInfo.reminded`, true)
         }

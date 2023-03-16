@@ -1,5 +1,9 @@
-const eris = require("eris")
-const bot = eris("NzkzMjgxNDcwNjk2NjUyODIx.Gy5mgs.zmIcUscRGurOKMFwedwknj4SUwVWAyThFG9goc")
+const config = require("./config.json")
+const discord = require("discord.js")
+const bot = new discord.Client({
+    intents: new discord.IntentsBitField(3276799)
+
+})
 const fs = require("fs")
 
 const eventsDir = fs.readdirSync("./events").filter(e => e.endsWith(".js"))
@@ -13,4 +17,4 @@ for (var eventFName of eventsDir) {
 }
 
 
-bot.connect()
+bot.login(config.token)

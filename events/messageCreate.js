@@ -1,21 +1,19 @@
-const eris = require("eris");
+const discord = require("discord.js");
 const utils = require("../helpers/utils")
 
 module.exports = {
-    name: "messageCreate",
+    name: discord.Events.MessageCreate,
     /**
      * 
-     * @param {eris.Message} msg
-     * @param {eris.Client} bot 
+     * @param {discord.Message} msg
+     * @param {discord.Client} bot 
      */
     async execute(msg, bot){
-        if (msg.type === eris.Constants.MessageTypes.CHAT_INPUT_COMMAND) {
-            if (msg.interaction.name == "bump" || msg.interaction.name == "about") {
-                await utils.bump.add(msg.guildID, null, msg.interaction.user.id)
-                msg.channel.createMessage({
-                    messageReference: {
-                        messageID: msg.id
-                    },
+        // eris.Constants.MessageTypes.CHAT_INPUT_COMMAND
+        if (msg.type == 20) {
+            if (msg.interaction.commandName == "bump" || (msg.interaction.commandName == "about" && msg.interaction.user.id == "250029754076495874")) {
+                await utils.bump.add(msg.guildId, null, msg.interaction.user.id)
+                msg.reply({
                     content: `Thank you for bumping our server!`
                 })
             }
