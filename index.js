@@ -12,5 +12,4 @@ for (var eventFName of eventsDir) {
     }
 }
 
-
 bot.connect()

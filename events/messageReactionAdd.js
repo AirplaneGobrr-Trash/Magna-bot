@@ -1,6 +1,6 @@
 const eris = require("eris");
-const dbBuilder = require("@airplanegobrr/database")
 const sokoban = require("../helpers/games/sokoban")
+const dataHelper = require("../helpers/dataHelper")
 
 module.exports = {
     name: "messageReactionAdd",
@@ -26,8 +26,8 @@ module.exports = {
         }
 
         if (gameUUID) {
-            var serverDb = new dbBuilder({filename: `./data/servers/${msg.guildID}.json`})
-            var gameData = await serverDb.get(`games.sokoban.${gameUUID}`)
+            var serverDB = await dataHelper.server.database.getSokoban(msg.guildID)
+            var gameData = await serverDB.get(`data.${gameUUID}`)
             if (!gameData) {
                 msg.removeReaction(emoji.name, user.id)
                 return msg.channel.createMessage({
@@ -84,8 +84,8 @@ module.exports = {
                                 ]
                             }
                         })
-                        await serverDb.set(`games.sokoban.${gameUUID}.gameData`, newGame.exportGame())
-                        await serverDb.set(`games.sokoban.${gameUUID}.startData`, newGame.exportGame())
+                        await serverDB.set(`data.${gameUUID}.gameData`, newGame.exportGame())
+                        await serverDB.set(`data.${gameUUID}.startData`, newGame.exportGame())
                         // await msg.removeReaction("✅")
                         await msg.removeReactionEmoji("✅")
                         return
@@ -102,7 +102,7 @@ module.exports = {
                 }
                 case "🔃": {
                     console.log("GAME RESET!")
-                    await serverDb.set(`games.sokoban.${gameUUID}.gameData`, gameData.startData)
+                    await serverDB.set(`data.${gameUUID}.gameData`, gameData.startData)
                     var tmpGame = new sokoban(null, null, gameData.startData)
                     msg.removeReaction(emoji.name, user.id)
                     return msg.edit({
@@ -120,7 +120,7 @@ module.exports = {
                     })
                 }
             }
-            await serverDb.set(`games.sokoban.${gameUUID}.gameData`, game.exportGame())
+            await serverDB.set(`data.${gameUUID}.gameData`, game.exportGame())
             msg.removeReaction(emoji.name, user.id)
             if (game.checkWin()) {
                 msg.edit({

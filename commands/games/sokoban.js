@@ -1,7 +1,7 @@
 const eris = require("eris");
 const sokoban = require("../../helpers/games/sokoban")
 const utils = require("../../helpers/utils")
-const dbBuilder = require("@airplanegobrr/database")
+const dataHelper = require("../../helpers/dataHelper")
 
 const Constants = eris.Constants;
 
@@ -41,7 +41,7 @@ module.exports = {
         }
 
         var gaTmp = new sokoban()
-        var serverDb = new dbBuilder({filename: `./data/servers/${interaction.guildID}.json`})
+        var serverDB = await dataHelper.server.database.getSokoban(interaction.guildID)
         var gameUUID = utils.generateUUID()
         await gaTmp.gen(0)
         await interaction.createMessage({
@@ -63,7 +63,7 @@ module.exports = {
         await sMsg.addReaction("⬇️")
         await sMsg.addReaction("➡️")
         await sMsg.addReaction("🔃")
-        await serverDb.set(`games.sokoban.${gameUUID}`, {
+        await serverDB.set(`data.${gameUUID}`, {
             msgID: sMsg.id,
             userID: interaction.member.id,
             gameData: gaTmp.exportGame(),

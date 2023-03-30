@@ -1,4 +1,5 @@
 const dbClass = require("@airplanegobrr/database");
+const dataHelper = require("./dataHelper")
 const Eris = require("eris");
 const fs = require("fs")
 
@@ -22,7 +23,7 @@ function generateUUID() {
  * @param {Number} userID ID user
  */
 async function bAdd(serverID, bumpID, userID) {
-    const serverDB = new dbClass({ filename: `./data/servers/${serverID}.json` })
+    const serverDB = await dataHelper.server.database.get(serverID)
     const userDB = new dbClass({ filename: `./data/users/${userID}.json` })
 
     var time = new Date().valueOf()
@@ -49,6 +50,7 @@ async function bAdd(serverID, bumpID, userID) {
  * @param {Eris.Client} client 
  */
 async function bCheck(client) {
+    if (!client.ready) return
     console.log("Running bump check!")
     var allServerData = {}
     var currentTime = new Date().valueOf()
@@ -56,7 +58,7 @@ async function bCheck(client) {
     const serverFiles = fs.readdirSync("./data/servers")
 
     for (var serverID of serverFiles) {
-        const serverDB = new dbClass({ filename: `./data/servers/${serverID}` })
+        const serverDB = await dataHelper.server.database.get(serverID.replace(".json", ""))
         const bumpInfo = await serverDB.get("bumpInfo")
 
         allServerData[serverID] = { canBump: false }
@@ -137,6 +139,7 @@ async function bCheck(client) {
             await userDB.set(`bumpInfo.reminded`, true)
         }
     }
+    return
 }
 
 module.exports = {
