@@ -19,8 +19,14 @@ This is Magna bot!
 - [ ] Ticket System (L)
 - [ ] Pin System (L)
 - [ ] Games 
-  - [ ] Chess (H)
+  - [ ] Chess (L)
   - [x] Sakoban (H)
+- [ ] Music (H)
+  - [ ] Play
+  - [ ] Stop
+  - [ ] Pause
+  - [ ] Skip
+  - [ ] Sneek
 - [ ] Ecom (VL)
   - [ ] Global Ecom
   - [ ] Server Ecom
