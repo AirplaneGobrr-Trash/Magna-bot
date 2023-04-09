@@ -1,6 +1,7 @@
 const eris = require("eris");
 const sokoban = require("../helpers/games/sokoban")
 const dataHelper = require("../helpers/dataHelper")
+const client = require("../helpers/clientBuilder")
 
 module.exports = {
     name: "messageReactionAdd",
@@ -9,7 +10,7 @@ module.exports = {
      * @param {eris.Message} msg 
      * @param {eris.Emoji} emoji 
      * @param {eris.User} user 
-     * @param {eris.Client} bot 
+     * @param {client} bot 
      */
     async execute(msg, emoji, user, bot) {
         if (user.id == bot.user.id) return

@@ -1,13 +1,14 @@
 const eris = require("eris");
 const fs = require("fs")
 const utils = require("../helpers/utils")
+const client = require("../helpers/clientBuilder")
 
 module.exports = {
     name: "ready",
     once: true,
     /**
      * 
-     * @param {eris.Client} bot 
+     * @param {client} bot 
      */
     async execute(bot) {
         // console.log(bot)

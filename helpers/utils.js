@@ -1,5 +1,6 @@
 const dbClass = require("@airplanegobrr/database");
 const dataHelper = require("./dataHelper")
+const client = require("./clientBuilder")
 const Eris = require("eris");
 const fs = require("fs")
 
@@ -47,7 +48,7 @@ async function bAdd(serverID, bumpID, userID) {
 
 /**
  * 
- * @param {Eris.Client} client 
+ * @param {client} client 
  */
 async function bCheck(client) {
     if (!client.ready) return

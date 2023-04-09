@@ -2,6 +2,7 @@ const eris = require("eris");
 const sokoban = require("../../helpers/games/sokoban")
 const utils = require("../../helpers/utils")
 const dataHelper = require("../../helpers/dataHelper")
+const client = require("../../helpers/clientBuilder")
 
 const Constants = eris.Constants;
 
@@ -30,7 +31,7 @@ module.exports = {
     /**
      * 
      * @param {eris.CommandInteraction} interaction 
-     * @param {eris.Client} bot 
+     * @param {client} bot 
      */
     async execute(interaction, bot){
         // await interaction.createMessage({tts: true, content: "Test!"})

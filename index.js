@@ -1,5 +1,5 @@
-const eris = require("eris")
-const bot = eris("NzkzMjgxNDcwNjk2NjUyODIx.Gy5mgs.zmIcUscRGurOKMFwedwknj4SUwVWAyThFG9goc")
+const client = require("./helpers/clientBuilder")
+const bot = new client("NzkzMjgxNDcwNjk2NjUyODIx.Gy5mgs.zmIcUscRGurOKMFwedwknj4SUwVWAyThFG9goc")
 const fs = require("fs")
 
 const eventsDir = fs.readdirSync("./events").filter(e => e.endsWith(".js"))

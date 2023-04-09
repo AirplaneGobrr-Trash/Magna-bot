@@ -1,5 +1,6 @@
 const eris = require("eris");
 const utils = require("../helpers/utils")
+const client = require("../helpers/clientBuilder")
 
 module.exports = {
     name: "messageCreate",
