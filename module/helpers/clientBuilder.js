@@ -5,7 +5,6 @@ class e extends eris.Client {
     constructor(token, options = {}) {
         super(token, options)
         this.music = new music(this)
-
     }
 }
 

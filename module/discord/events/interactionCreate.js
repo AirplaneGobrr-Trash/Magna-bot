@@ -1,5 +1,5 @@
 const eris = require("eris");
-const client = require("../helpers/clientBuilder")
+const client = require("../../helpers/clientBuilder")
 
 module.exports = {
     name: "interactionCreate",
@@ -9,7 +9,7 @@ module.exports = {
      * @param {client} bot 
      */
     async execute(interaction, bot){
-        console.log(interaction)
+        // console.log(interaction)
         if (interaction instanceof eris.CommandInteraction) {
             let commandName = interaction.data.name
             let command = bot.loadedCommands.get(commandName)

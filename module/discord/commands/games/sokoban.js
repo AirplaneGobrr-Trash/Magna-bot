@@ -1,8 +1,9 @@
 const eris = require("eris");
-const sokoban = require("../../helpers/games/sokoban")
-const utils = require("../../helpers/utils")
-const dataHelper = require("../../helpers/dataHelper")
-const client = require("../../helpers/clientBuilder")
+const sokoban = require("../../../helpers/games/sokoban")
+const utils = require("../../../helpers/utils")
+const dataHelper = require("../../../helpers/dataHelper")
+const client = require("../../../helpers/clientBuilder")
+
 
 const Constants = eris.Constants;
 

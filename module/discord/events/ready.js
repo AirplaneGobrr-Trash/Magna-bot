@@ -1,7 +1,8 @@
 const eris = require("eris");
+const path = require("path");
 const fs = require("fs")
-const utils = require("../helpers/utils")
-const client = require("../helpers/clientBuilder")
+const utils = require("../../helpers/utils")
+const client = require("../../helpers/clientBuilder")
 
 module.exports = {
     name: "ready",
@@ -13,7 +14,7 @@ module.exports = {
     async execute(bot) {
         // console.log(bot)
 
-        const commandTypes = fs.readdirSync("./commands")
+        const commandTypes = fs.readdirSync(path.join(__dirname, "..", "commands"))
         let commands = null
         let loadedCommands = new Map()
 
@@ -28,7 +29,7 @@ module.exports = {
         // console.log(commands)
 
         for (var commandType of commandTypes) {
-            const commandFiles = fs.readdirSync(`./commands/${commandType}`)
+            const commandFiles = fs.readdirSync(path.join(__dirname, "..", "commands", commandType)) 
             for (var commandFile of commandFiles) {
                 const commandData = require(`../commands/${commandType}/${commandFile}`)
                 let commandD = commandData.command

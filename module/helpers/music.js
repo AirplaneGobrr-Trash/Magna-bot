@@ -1,11 +1,10 @@
 const { getVideoDurationInSeconds: duration } = require('get-video-duration')
 const SpotifyWebApi = require('spotify-web-api-node');
-const sanitize = require("sanitize-filename");
 const yt_download = require("ytdl-core")
 const yt_Search = require("yt-search")
 const path = require("path")
 const fs = require("fs")
-const dbClass = require("@airplanegobrr/database")
+const dataHelper = require("./dataHelper")
 
 const { spotify } = require("../config.json");
 const Eris = require('eris');
@@ -14,6 +13,9 @@ const spotifyApi = new SpotifyWebApi({
     clientId: spotify.clientID,
     clientSecret: spotify.clientSecret
 });
+
+// const video = document.getElementById('myVideo');
+// video.currentTime = 10;
 
 async function renewSpotify() {
     // Retrieve an access token
@@ -96,32 +98,78 @@ class music {
         // this.#spotify = new spotifyC()
     }
 
+    async download(url){
+        if (url && isValidUrl(url)) {
+            // check if string or array
+            if (Array.isArray(url)) {
+                for (var url of url) {
+                    await this.download(url[i])
+                }
+            } else {
+                return new Promise((resolve, reject) => {
+                    const stream = yt_download(songURL, { quality: "highestaudio" });
+                    let fileName = yt_download.getURLVideoID(songURL)
+                    stream.pipe(fs.createWriteStream(`./data/songs/${fileName}.mp4`));
+        
+                    stream.on('end', async () => {
+                        resolve(outputfile)
+                    }).on("progress", async (chunkLength, downloaded, total) => {
+                        var MB = downloaded / 1000000;
+                        var MBTotal = total / 1000000;
+        
+                        var KB = downloaded / 1000;
+                        var KBTotal = total / 1000;
+        
+                        var percent = (downloaded / total) * 100;
+                        this.comment = `${outputfile.replace("./songs/", "").replace(".mp4", "").replaceAll(".", "")}: ${percent}% - ${MB}MB of ${MBTotal}MB OR ${KB}KB of ${KBTotal}KB`
+                        console.debug(this.comment);
+        
+                        if (percent == 100) {
+                            resolve(outputfile)
+                            stream.emit("end")
+                        }
+        
+                    }).on("error", (err) => {
+                        console.log(err);
+                        resolve(null)
+                    })
+                })
+            }
+        }
+        
+    }
+
     async lookupSong(songName) {
         var ytData = await yt_Search(songName)
         return ytData?.videos[0] ?? null
     }
-    async add(song) {
-        // Song can be a URL or song name
-        
+    async getURL(song){
         if (isValidUrl(song)) {
             const urlData = new URL(song)
             const urlList = urlData.searchParams.get("list")
             const urlID = urlData.searchParams.get("v")
             if (urlList) {
+                var urls = null
                 const videosData = await yt_Search({ listId: urlList })
-                console.log("Playlist", videosData)
-
+                if (videosData.videos && videosData.videos.length > 0) {
+                    // if its only one video then just return it
+                    urls = videosData.videos.map(obj => obj.url);
+                }
+                return urls
             } else if (urlID) {
                 const videoData = await yt_Search({ videoId: urlID })
-                console.log(videoData)
+                return videoData?.url ?? null
             }
+        } else {
+            const ytData = await this.lookupSong(song)
+            return ytData?.url ?? null
         }
-
-        const ytData = await this.lookupSong(song)
-
-        if (ytData) {
-            console.log(ytData)
-        }
+    }
+    async add(song) {
+        // Song can be a URL or song name
+        const url = await this.getURL(song)
+        const str = await this.download(url)
+        
     }
 }
 

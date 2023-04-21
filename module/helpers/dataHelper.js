@@ -2,8 +2,11 @@ const fs = require("fs")
 const path = require("path")
 const dbBuilder = require("@airplanegobrr/database")
 
-const dataPath = path.join(__dirname, "..", "data")
+const dataPath = path.join(__dirname, "..", "..", "data", "discord")
 const serverDataPath = path.join(dataPath, "servers")
+const userDataPath = path.join(dataPath, "users")
+fs.mkdirSync(serverDataPath, {recursive: true})
+fs.mkdirSync(userDataPath, {recursive: true})
 
 const server = {
     database: {
@@ -20,6 +23,22 @@ const server = {
     }
 }
 
+const user = {
+    database: {
+        async get(userID) {
+            const filePath = path.join(userDataPath, `${userID}.json`)
+            return new dbBuilder({ filename: filePath })
+        }
+    }
+
+}
+
 module.exports = {
-    server
+    server,
+    user,
+    paths: {
+        dataPath,
+        serverDataPath,
+        userDataPath
+    }
 }

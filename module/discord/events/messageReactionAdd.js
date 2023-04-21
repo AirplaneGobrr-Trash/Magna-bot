@@ -1,7 +1,7 @@
 const eris = require("eris");
-const sokoban = require("../helpers/games/sokoban")
-const dataHelper = require("../helpers/dataHelper")
-const client = require("../helpers/clientBuilder")
+const sokoban = require("../../helpers/games/sokoban")
+const dataHelper = require("../../helpers/dataHelper")
+const client = require("../../helpers/clientBuilder")
 
 module.exports = {
     name: "messageReactionAdd",
