@@ -120,7 +120,7 @@ client.on('message', async (channel, userstate, message, self) =>{
             if (twitch[command]) {
                 return client.say(channel, twitch[command]);
             }
-            client.say(channel, `Sorry, I don't know how to do that.`);
+            // client.say(channel, `Sorry, I don't know how to do that.`);
         }
         return;
     }
