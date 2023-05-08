@@ -1,7 +1,7 @@
 const eris = require("eris");
 const sokoban = require("../../../helpers/games/sokoban")
 const utils = require("../../../helpers/utils")
-const dataHelper = require("../../../helpers/dataHelper")
+const { discord: dataHelper } = require("../../../helpers/dataHelper")
 const client = require("../../../helpers/clientBuilder")
 
 

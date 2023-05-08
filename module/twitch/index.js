@@ -1,5 +1,7 @@
 const dBuilder = require("@airplanegobrr/database")
-const db = new dBuilder()
+const path = require("path")
+const dbPath = path.join(__dirname, "..", "..", "data", "twitch")
+const db = new dBuilder({filename: ""})
 const tmi = require('tmi.js');
 
 const { parentPort, BroadcastChannel } = require("worker_threads")
@@ -132,7 +134,7 @@ client.on('connected', async (addr, port)=>{
         channel = channel.replace('#', '')
         if (!await db.has(`twitch.${channel}.webID`)) {
             console.log(`* ${channel} no web link!`);
-            client.say(channel, "Hey! It looks like you're not paired with our website. Please pair using this link: https://thundercrazydog.airplanegobrr.xyz/auth/twitch?streamer=true")                
+            // client.say(channel, "Hey! It looks like you're not paired with our website. Please pair using this link: https://magna.airplanegobrr.xyz/auth/twitch?streamer=true")                
         }
     }
 });

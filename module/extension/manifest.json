@@ -1,0 +1,17 @@
+{
+    "manifest_version": 2,
+    "name": "Script Loader",
+    "version": "1.0",
+    "description": "Script loader for Chess.com",
+    "content_scripts": [
+        {
+            "matches": [
+                "*://*.mozilla.org/*",
+                "*://*.chess.com/*"
+            ],
+            "js": [
+                "load.js"
+            ]
+        }
+    ]
+}

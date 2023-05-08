@@ -1,4 +1,4 @@
-const dataHelper = require("./dataHelper")
+const { discord: dataHelper } = require("./dataHelper")
 const client = require("./clientBuilder")
 const path = require("path")
 const fs = require("fs")
@@ -32,11 +32,11 @@ async function bAdd(serverID, bumpID, userID) {
     // 30 min 1800000
 
     await serverDB.set(`bumpInfo.lastBump`, time)
-    await serverDB.set(`bumpInfo.nextBump`, time + 7200000)
-    await serverDB.set(`bumpInfo.nextBumpReminder`, time + 7200000)
+    await serverDB.set(`bumpInfo.nextBump`, time + 7_200_000)
+    await serverDB.set(`bumpInfo.nextBumpReminder`, time + 7_200_000)
 
     await userDB.set(`bumpInfo.lastBump`, time)
-    await userDB.set(`bumpInfo.nextAvailableBump`, time + 1800000)
+    await userDB.set(`bumpInfo.nextAvailableBump`, time + 1_800_000)
     await userDB.add(`bumpInfo.totalBumps`, 1)
     await userDB.set(`bumpInfo.reminded`, false)
 
@@ -105,11 +105,11 @@ async function bCheck(client) {
         // var alreadyReminded = await userDB.get(`${userID}.bumpInfo.reminded`)
         // var userServers = await userDB.get(`${userID}.bumpInfo.servers`)
 
-        if (!bumpInfo.nextBump) bumpInfo.nextBump = 0
+        if (!bumpInfo.nextAvailableBump) bumpInfo.nextAvailableBump = 0
 
-        if (currentTime >= bumpInfo?.nextBump) {
+        if (currentTime >= bumpInfo?.nextAvailableBump) {
             var user = client.users.get(userID.replace(".json", ""))
-            console.log(user)
+            
             if (!user) continue
             var bumpMessage = ``
 
@@ -142,10 +142,38 @@ async function bCheck(client) {
     return
 }
 
+/**
+ * 
+ * @param {import("eris").InteractionDataOptions} interactionData 
+ * @returns 
+ */
+async function optionsPraser(interactionData){
+    let options = {}
+    // console.log("run",interactionData)
+    for (var option of interactionData) {
+        // options[opt.name] = opt.value ?? opt
+        if (option.type === Constants.ApplicationCommandOptionTypes.SUB_COMMAND_GROUP) {
+            // console.log("subGroup", __bName, option.name, option.options)
+            options[option.name] = await optionsPraser(option.options)
+
+        } else if (option.type === Constants.ApplicationCommandOptionTypes.SUB_COMMAND) {
+            // console.log("sub command", __bName, option.name, option.options)
+            options[option.name] = await optionsPraser(option.options)
+
+        } else {
+            options[option.name] = option.value
+        }
+    }
+    return options
+}
+
 module.exports = {
     generateUUID,
     bump: {
         add: bAdd,
         check: bCheck
+    },
+    discord: {
+        optionsPraser
     }
 }

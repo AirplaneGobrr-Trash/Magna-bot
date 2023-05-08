@@ -4,7 +4,7 @@ const yt_download = require("ytdl-core")
 const yt_Search = require("yt-search")
 const path = require("path")
 const fs = require("fs")
-const dataHelper = require("./dataHelper")
+const { discord: dataHelper } = require("./dataHelper")
 
 const { spotify } = require("../config.json");
 const Eris = require('eris');

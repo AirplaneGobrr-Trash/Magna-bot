@@ -2,6 +2,7 @@ const { app, express, http, io, server } = require('./web')
 const apiB = require('../twitch/api');
 const utils = require('../helpers/utils')
 
+const path = require('path')
 
 const dbBuilder = require("@airplanegobrr/database")
 const db = new dbBuilder()
@@ -13,7 +14,7 @@ const bc = new BroadcastChannel("com")
 const streamerAPI = new apiB({
     clientID: "y32z2hefjjijzxcpv3md5x4ee4ngvu",
     clientSecret: "vc564cqo3q8co44nm22z355rmhlour",
-    callbackURL: "https://thundercrazydog.airplanegobrr.xyz/auth/twitch/callback",
+    callbackURL: "https://magna.airplanegobrr.xyz/auth/twitch/callback",
     scopes: [
         "analytics:read:extensions",
         "analytics:read:games",
@@ -140,13 +141,17 @@ app.get('/', authCheck, async (req, res) => {
     res.send(`Hello ${req.token}, ${twitchMessage}`)
 });
 
+app.get("/streamScript", (req, res) => {
+    res.sendFile(path.join(__dirname,"..", "extension", "stream.js"))
+})
+
 app.get('/auth/twitch', authCheck, (req, res) => {
     if (req.query.streamer) return res.redirect(streamerAPI.getAccessURL())
     res.redirect(baseAPI.getAccessURL()) 
 });
 
 app.get('/twitch', authCheck, async (req, res) => {
-    res.send(`<a>A</a>`)
+    res.send(`Looks like you are logged in as ${req?.twitch?.display_name}, You should see a message in your twitch chat!`)
 })
 app.get("/twitch/user", authCheck, async (req, res) => {
     try {

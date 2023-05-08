@@ -84,6 +84,10 @@ class TwitchAPI {
                     'Authorization': `Bearer ${token}`,
                     'Accept': 'application/vnd.twitchtv.v5+json'
                 }
+            }).then(response => {
+                resolve(response.data)
+            }).catch((error) => {
+                reject(error)
             })
         })
     }
