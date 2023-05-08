@@ -22,7 +22,7 @@ This is Magna bot!
   - [ ] Chess (L)
   - [x] Sakoban (H)
 - [ ] Music (H)
-  - [ ] Play
+  - [x] Play
   - [ ] Stop
   - [ ] Pause
   - [ ] Skip

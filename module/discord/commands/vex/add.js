@@ -55,7 +55,7 @@ module.exports = {
         
         console.log(await optionsPraser(interaction.data.options));
 
-        await interaction.createMessage("k")
+        await interaction.createMessage("WIP")
         // console.log(JSON.stringify(interaction.data.options, null, 2))
     }
 }

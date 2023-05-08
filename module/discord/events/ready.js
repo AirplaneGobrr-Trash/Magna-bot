@@ -2,7 +2,8 @@ const eris = require("eris");
 const path = require("path");
 const fs = require("fs")
 const utils = require("../../helpers/utils")
-const client = require("../../helpers/clientBuilder")
+const client = require("../../helpers/clientBuilder");
+const dataHelper = require("../../helpers/dataHelper");
 
 module.exports = {
     name: "ready",

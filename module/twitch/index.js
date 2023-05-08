@@ -1,7 +1,7 @@
 const dBuilder = require("@airplanegobrr/database")
 const path = require("path")
 const dbPath = path.join(__dirname, "..", "..", "data", "twitch")
-const db = new dBuilder({filename: ""})
+const db = new dBuilder({filename: "twitch.json"})
 const tmi = require('tmi.js');
 
 const { parentPort, BroadcastChannel } = require("worker_threads")

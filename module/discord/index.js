@@ -1,7 +1,8 @@
-// const client = require("./helpers/clientBuilder")
-const { Client } = require("eris")
-const bot = new Client("NzkzMjgxNDcwNjk2NjUyODIx.Gy5mgs.zmIcUscRGurOKMFwedwknj4SUwVWAyThFG9goc", {
-    intents: ["all", "allPrivileged", "allNonPrivileged", "guilds"]
+const { discord: config } = require("../../config.json")
+const Client = require("../helpers/clientBuilder")
+// const { Client } = require("eris")
+const bot = new Client(config.token, {
+    intents: ["all"]
 })
 
 const path = require("path")

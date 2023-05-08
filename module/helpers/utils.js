@@ -1,5 +1,6 @@
 const { discord: dataHelper } = require("./dataHelper")
 const client = require("./clientBuilder")
+const { Constants } = require("eris")
 const path = require("path")
 const fs = require("fs")
 

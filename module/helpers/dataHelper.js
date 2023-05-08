@@ -22,6 +22,38 @@ const discord_server = {
             const filePath = path.join(discord_serverDataPath, serverID, "games", "sokoban.json")
             fs.mkdirSync(path.join(discord_serverDataPath, serverID, "games"), {recursive: true})
             return new dbBuilder({ filename: filePath })
+        },
+        async getSong(serverID) {
+            const filePath = path.join(discord_serverDataPath, serverID, "songs.json")
+            fs.mkdirSync(path.join(discord_serverDataPath, serverID), {recursive: true})
+            return new dbBuilder({ filename: filePath })
+        }
+    },
+    song: {
+        async add(serverID, channelID, songID) {
+            const serverDB = await discord_server.database.getSong(serverID)
+            await serverDB.set("channel", channelID)
+            if (!await serverDB.has("song")) await serverDB.set("songs", [])
+            await serverDB.push("songs", songID)
+            return songID
+        },
+        async getNext(serverID) {
+            const serverDB = await discord_server.database.getSong(serverID)
+            const songs = await serverDB.get("songs")
+            var song = songs.shift()
+            if (!song) return null
+            await serverDB.set("songs", songs)
+            return song
+        },
+        async getQueue(serverID) {
+            const serverDB = await discord_server.database.getSong(serverID)
+            const songs = await serverDB.get("songs")
+            return songs ?? null
+        },
+        async check(serverID){
+            const serverDB = await discord_server.database.getSong(serverID)
+            const songs = await serverDB.get("songs") ?? {}
+            if (Object.keys(songs).length > 0) return true; else  return false;
         }
     }
 }
@@ -36,7 +68,6 @@ const discord_user = {
 
 }
 //#endregion
-
 
 //#region Web
 //#endregion
@@ -63,5 +94,6 @@ module.exports = {
             serverDataPath: discord_serverDataPath,
             userDataPath: discord_userDataPath
         }
-    }
+    },
+    mainDataPath
 }
