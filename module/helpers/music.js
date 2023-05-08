@@ -41,6 +41,11 @@ async function renewSpotify() {
     ).catch(e => { })
 }
 
+renewSpotify()
+setInterval(() => {
+    renewSpotify()
+}, 120 * 1000)
+
 const isValidUrl = urlString => {
     var urlPattern = new RegExp('^(https?:\\/\\/)?' + // validate protocol
         '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // validate domain name
@@ -68,22 +73,26 @@ class spotifyC {
             return { data: songData.body.tracks.items, type: 3 }
         }
     }
-    async #get(url) {
+    async get(url) {
         let sData = await this.data(url)
         switch (sData.type) {
-            case "playlist": {
+            case 1: {
+                var o = []
                 for (var trackData of sData.data) {
-                    return `${trackData.track.name} BY: ${trackData.track.artists[0].name}`
+                    if (trackData && trackData.track) o.push(`${trackData.track.name} BY: ${trackData.track.artists[0].name}`)
                 }
+                return o
                 break
             }
-            case "album": {
+            case 3: {
+                var o = []
                 for (var trackData of sData.data) {
-                    return `${trackData.name} BY: ${trackData.artists[0].name}`
+                    if (trackData && trackData.name) o.push(`${trackData.name} BY: ${trackData.artists[0].name}`)
                 }
+                return o
                 break
             }
-            case "track": {
+            case 2: {
                 return `${sData.data.name} BY: ${sData.data.album.artists[0].name}`
                 break
             }
@@ -100,7 +109,8 @@ class music {
      * @param {Eris.Client} bot 
      */
     constructor(bot) {
-        // this.#spotify = new spotifyC()
+        this.spotify = new spotifyC()
+
         setInterval(async () => {
             if (!bot.ready) return
             const servers = bot.guilds
@@ -118,9 +128,9 @@ class music {
                         const song = await dataHelper.server.song.getNext(serverID)
                         var songPath = path.join(songsPath, `${song}.mp4`)
                         vc.play(songPath, { inlineVolume: true })
-                        
+
                         // console.log("Playing", song, songPath, await duration(songPath) * 1009)
-                        // 164429.46519999998
+
                     }
                 }
             }
@@ -137,9 +147,9 @@ class music {
                     outs.push(d)
                 }
                 return outs
-            } else if (isValidUrl(url)) {
+            } else if (url && isValidUrl(url.url)) {
                 return new Promise(async (resolve, reject) => {
-                    let fileName = yt_download.getURLVideoID(url)
+                    let fileName = yt_download.getURLVideoID(url.url)
                     const outputfile = path.join(songsPath, `${fileName}.mp4`)
 
                     // check if the file exists
@@ -147,12 +157,12 @@ class music {
                         console.log("Using cached file")
                         return resolve({ file: fileName, action: "cache"})
                     } else {
-                        var info = await yt_download.getInfo(url)
+                        var info = await yt_download.getInfo(url.url)
                         // console.log(info.formats)
                         var toSave = info.formats.filter((format) => format.hasVideo && format.hasAudio)
                         var middle = toSave[Math.floor(toSave.length / 2)] ?? { itag: "lowest" }; // default to lowest
 
-                        const stream = yt_download(url, { quality: middle.itag });
+                        const stream = yt_download(url.url, { quality: middle.itag });
 
                         // `./data/songs/${fileName}.mp4`
 
@@ -227,16 +237,27 @@ class music {
     }
     /**
      * 
-     * @param {*} song
+     * @param {String} song
      * @param {*} guildID
      * @param {*} channelID
      * @param {Client} _bot
      * @param {Eris.CommandInteraction} _interaction
      */
-    async add(song, guildID, channelID, _bot, _interaction) {
+    async add(song, guildID, channelID, _bot, _interaction, _shutUp = false) {
+        if (song.includes("open.spotify.com")) {
+            var data = await this.spotify.get(song)
+            console.log("Spotify Data", data)
+            if (Array.isArray(data)) {
+                for (var sName of data) {
+                    await this.add(sName, guildID, channelID, _bot, _interaction, true)
+                }
+                await _interaction.createFollowup(`Added songs from ${song}`)
+                return
+            } else song = data
+        }
         // Song can be a URL or song name
         const urlData = await this.getURL(song)
-        await _interaction.createFollowup("Got song URL!")
+        if (!_shutUp) await _interaction.createFollowup("Got song URL!")
         if (song) {
             var videoInfo = await this.download(urlData)
             if (Array.isArray(videoInfo)) {
@@ -245,11 +266,14 @@ class music {
                     if (videoInfo.action == "error") continue
                     await dataHelper.server.song.add(guildID, channelID, data.file)
                 }
-                await _interaction.createFollowup(`Added ${Object.keys(videoInfo).length} songs`)
+                if (!_shutUp) await _interaction.createFollowup(`Added ${Object.keys(videoInfo).length} songs`)
+                return
             } else {
-                if (videoInfo.action == "error") return await _interaction.createFollowup("Error downloading song!")
-                await _interaction.createFollowup(`Using ${videoInfo.action} for ${song}`)
+                console.log(song, urlData, videoInfo)
+                if (videoInfo.action == "error" && !_shutUp) return await _interaction.createFollowup("Error downloading song!")
+                if (!_shutUp) await _interaction.createFollowup(`Using ${videoInfo.action} for ${song}`)
                 await dataHelper.server.song.add(guildID, channelID, videoInfo.file)
+                return
             }
         }
     }

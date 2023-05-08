@@ -1,6 +1,7 @@
 const eris = require("eris");
 const client = require("../../../helpers/clientBuilder")
-const { discord: { optionsPraser } } = require("../../../helpers/utils")
+const { discord: { optionsPraser } } = require("../../../helpers/utils");
+const dataHelper = require("../../../helpers/dataHelper");
 
 const Constants = eris.Constants;
 
@@ -48,6 +49,11 @@ module.exports = {
                 type: Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
             },
             {
+                name: "clear",
+                description: "Clears the queue",
+                type: Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
+            },
+            {
                 name: "pause",
                 description: "Toggles if playing or paused for the current song",
                 type: Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
@@ -72,6 +78,17 @@ module.exports = {
         // console.log("CommandOptions", command, options)
         switch (command) {
             case "queue": {
+                break
+            }
+            case "clear": {
+                var vc = bot.voiceConnections.get(interaction.guildID)
+                if (vc) {
+                    var serverDB = await dataHelper.discord.server.database.getSong(interaction.guildID)
+                    await serverDB.set("songs", [])
+                    await vc.stopPlaying()
+                    await interaction.createMessage("Cleared queue!")
+                    break
+                }
                 break
             }
             case "pause": {

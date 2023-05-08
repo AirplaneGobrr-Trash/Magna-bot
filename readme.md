@@ -25,9 +25,9 @@ This is Magna bot!
   - [x] Play
   - [x] Pause
   - [x] Skip
-  - [ ] Sneek (Might not be possible)
+  - [ ] Sneek (Might not be possible) (We would have to skip to the pos while loading the file, so we would have to "reopen" the connection)
   - [ ] Spotify Support
-  - [ ] YouTube Playlist Support ?
+  - [x] YouTube Playlist Support
 - [ ] Ecom (VL)
   - [ ] Global Ecom
   - [ ] Server Ecom
