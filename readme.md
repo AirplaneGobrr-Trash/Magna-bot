@@ -19,8 +19,15 @@ This is Magna bot!
 - [ ] Ticket System (L)
 - [ ] Pin System (L)
 - [ ] Games 
-  - [ ] Chess (H)
+  - [ ] Chess (L)
   - [x] Sakoban (H)
+- [ ] Music (H)
+  - [x] Play
+  - [x] Pause
+  - [x] Skip
+  - [ ] Sneek (Might not be possible) (We would have to skip to the pos while loading the file, so we would have to "reopen" the connection)
+  - [ ] Spotify Support
+  - [x] YouTube Playlist Support
 - [ ] Ecom (VL)
   - [ ] Global Ecom
   - [ ] Server Ecom

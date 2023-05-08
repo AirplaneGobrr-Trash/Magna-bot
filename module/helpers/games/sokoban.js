@@ -86,7 +86,7 @@ class sokoban {
             gameRender+=`${row.join("")}\n`
         }
         // console.log(gameRender)
-        fs.writeFileSync("game.txt", gameRender)
+        // fs.writeFileSync("game.txt", gameRender)
         return gameRender
     
     }
