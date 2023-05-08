@@ -9,6 +9,8 @@ const { discord: dataHelper, mainDataPath } = require("./dataHelper")
 const songsPath = path.join(mainDataPath, "songs")
 fs.mkdirSync(songsPath, { recursive: true })
 
+const Client = require("./clientBuilder")
+
 const { spotify } = require("../../config.json");
 const Eris = require('eris');
 
@@ -99,113 +101,156 @@ class music {
      */
     constructor(bot) {
         // this.#spotify = new spotifyC()
-        setInterval(async () =>{
+        setInterval(async () => {
             if (!bot.ready) return
             const servers = bot.guilds
             for (var serverID of servers.keys()) {
                 if (await dataHelper.server.song.check(serverID)) {
-                    console.log(serverID, "Has song(s) in line!")
-                    console.log(bot.guilds.get(serverID).voiceStates)
+                    // console.log(serverID, "Has song(s) in line!")
+                    // console.log(bot.guilds.get(serverID).voiceStates)
 
                     var vc = bot.voiceConnections.get(serverID)
                     const voiceChannelID = await (await dataHelper.server.database.getSong(serverID)).get("channel")
                     // console.log("channel",voiceChannelID)
                     if (!vc) vc = await bot.joinVoiceChannel(voiceChannelID)
-                    if (vc && vc.ready && !vc.playing) {
+                    // console.log("Voice status", "Playing", vc?.playing, "Paused", vc?.paused, "Timestamp", vc?.current?.playTime)
+                    if (vc && vc.ready && !vc.playing && !vc.paused) {
                         const song = await dataHelper.server.song.getNext(serverID)
                         var songPath = path.join(songsPath, `${song}.mp4`)
                         vc.play(songPath, { inlineVolume: true })
-                        console.log("Playing", song, songPath)
-                    } else {
-                        console.log("Something is wrong", vc?.ready, vc?.playing)
+                        
+                        // console.log("Playing", song, songPath, await duration(songPath) * 1009)
+                        // 164429.46519999998
                     }
                 }
             }
         }, 300)
     }
 
-    async download(url){
-        if (url && isValidUrl(url)) {
+    async download(url) {
+        if (url) {
             // check if string or array
             if (Array.isArray(url)) {
-                for (var url of url) {
-                    await this.download(url[i])
+                var outs = []
+                for (var i of url) {
+                    var d = await this.download(i.url)
+                    outs.push(d)
                 }
-                return
-            } else {
+                return outs
+            } else if (isValidUrl(url)) {
                 return new Promise(async (resolve, reject) => {
-                    var info = await yt_download.getInfo(url)
-                    // console.log(info.formats)
-                    var toSave = info.formats.filter((format)=> format.hasVideo && format.hasAudio)
-                    var middle = toSave[Math.floor(toSave.length / 2)] ?? { itag: "lowest"}; // default to lowest
-
-                    const stream = yt_download(url, { quality: middle.itag });
                     let fileName = yt_download.getURLVideoID(url)
-                    // `./data/songs/${fileName}.mp4`
                     const outputfile = path.join(songsPath, `${fileName}.mp4`)
-                    stream.pipe(fs.createWriteStream(outputfile));
-        
-                    stream.on('end', async () => {
-                        resolve(fileName)
-                    }).on("progress", async (chunkLength, downloaded, total) => {
-                        var MB = downloaded / 1000000;
-                        var MBTotal = total / 1000000;
-        
-                        var KB = downloaded / 1000;
-                        var KBTotal = total / 1000;
-        
-                        var percent = (downloaded / total) * 100;
-                        this.comment = `${fileName.replace("./songs/", "").replace(".mp4", "").replaceAll(".", "")}: ${percent}% - ${MB}MB of ${MBTotal}MB OR ${KB}KB of ${KBTotal}KB`
-                        // console.debug(this.comment);
-        
-                        if (percent == 100) {
-                            resolve(fileName)
-                            stream.emit("end")
-                        }
-        
-                    }).on("error", (err) => {
-                        console.log(err);
-                        resolve(null)
-                    })
+
+                    // check if the file exists
+                    if (fs.existsSync(outputfile)) {
+                        console.log("Using cached file")
+                        return resolve({ file: fileName, action: "cache"})
+                    } else {
+                        var info = await yt_download.getInfo(url)
+                        // console.log(info.formats)
+                        var toSave = info.formats.filter((format) => format.hasVideo && format.hasAudio)
+                        var middle = toSave[Math.floor(toSave.length / 2)] ?? { itag: "lowest" }; // default to lowest
+
+                        const stream = yt_download(url, { quality: middle.itag });
+
+                        // `./data/songs/${fileName}.mp4`
+
+                        stream.pipe(fs.createWriteStream(outputfile));
+
+                        stream.on('end', async () => {
+                            return resolve({ file: fileName, action: "download"})
+                        }).on("progress", async (chunkLength, downloaded, total) => {
+                            var MB = downloaded / 1000000;
+                            var MBTotal = total / 1000000;
+
+                            var KB = downloaded / 1000;
+                            var KBTotal = total / 1000;
+
+                            var percent = (downloaded / total) * 100;
+                            this.comment = `${fileName.replace("./songs/", "").replace(".mp4", "").replaceAll(".", "")}: ${percent}% - ${MB}MB of ${MBTotal}MB OR ${KB}KB of ${KBTotal}KB`
+                            console.debug(this.comment);
+
+                            if (percent == 100) {
+                                resolve({ file: fileName, action: "download"})
+                            }
+
+                        }).on("error", (err) => {
+                            console.log(err);
+                            return resolve({ file: null, action: "error"})
+                        })
+                    }
                 })
             }
         }
-        
+
     }
 
     async lookupSong(songName) {
         var ytData = await yt_Search(songName)
         return ytData?.videos[0] ?? null
     }
-    async getURL(song){
+    async getURL(song) {
         if (isValidUrl(song)) {
             const urlData = new URL(song)
             const urlList = urlData.searchParams.get("list")
             const urlID = urlData.searchParams.get("v")
             if (urlList) {
-                var urls = null
+                var urls = []
                 const videosData = await yt_Search({ listId: urlList })
                 if (videosData.videos && videosData.videos.length > 0) {
-                    // if its only one video then just return it
-                    urls = videosData.videos.map(obj => obj.url);
+                    for (var videoData of videosData.videos) {
+                        urls.push({
+                            url: `https://www.youtube.com/watch?v=${videoData.videoId}`,
+                            title: videoData.title,
+                            uploader: videoData.author.name
+                        })
+                    }
                 }
                 return urls
             } else if (urlID) {
                 const videoData = await yt_Search({ videoId: urlID })
-                return videoData?.url ?? null
+                return {
+                    url: videoData.url,
+                    title: videoData.title,
+                    uploader: videoData.author.name
+                }
             }
         } else {
-            const ytData = await this.lookupSong(song)
-            return ytData?.url ?? null
+            const videoData = await this.lookupSong(song)
+            return {
+                url: videoData.url,
+                title: videoData.title,
+                uploader: videoData.author.name
+            }
         }
     }
-    async add(song, guildID, channelID) {
+    /**
+     * 
+     * @param {*} song
+     * @param {*} guildID
+     * @param {*} channelID
+     * @param {Client} _bot
+     * @param {Eris.CommandInteraction} _interaction
+     */
+    async add(song, guildID, channelID, _bot, _interaction) {
         // Song can be a URL or song name
-        const url = await this.getURL(song)
+        const urlData = await this.getURL(song)
+        await _interaction.createFollowup("Got song URL!")
         if (song) {
-            const str = await this.download(url)
-            console.log("Song downloaded", str)
-            await dataHelper.server.song.add(guildID, channelID, str)
+            var videoInfo = await this.download(urlData)
+            if (Array.isArray(videoInfo)) {
+                var big = ""
+                for (var data of videoInfo) {
+                    if (videoInfo.action == "error") continue
+                    await dataHelper.server.song.add(guildID, channelID, data.file)
+                }
+                await _interaction.createFollowup(`Added ${Object.keys(videoInfo).length} songs`)
+            } else {
+                if (videoInfo.action == "error") return await _interaction.createFollowup("Error downloading song!")
+                await _interaction.createFollowup(`Using ${videoInfo.action} for ${song}`)
+                await dataHelper.server.song.add(guildID, channelID, videoInfo.file)
+            }
         }
     }
 }

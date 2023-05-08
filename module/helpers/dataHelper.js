@@ -33,7 +33,7 @@ const discord_server = {
         async add(serverID, channelID, songID) {
             const serverDB = await discord_server.database.getSong(serverID)
             await serverDB.set("channel", channelID)
-            if (!await serverDB.has("song")) await serverDB.set("songs", [])
+            // if (!await serverDB.has("songs")) await serverDB.set("songs", [])
             await serverDB.push("songs", songID)
             return songID
         },
@@ -43,6 +43,7 @@ const discord_server = {
             var song = songs.shift()
             if (!song) return null
             await serverDB.set("songs", songs)
+            await serverDB.set("currentSong", song)
             return song
         },
         async getQueue(serverID) {

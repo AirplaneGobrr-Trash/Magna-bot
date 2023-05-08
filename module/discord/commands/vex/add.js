@@ -5,7 +5,7 @@ const { discord: { optionsPraser } } = require("../../../helpers/utils") // JS m
 const Constants = eris.Constants;
 
 module.exports = {
-    alwaysUpdate: true,
+    alwaysUpdate: false,
     command: {
         name: "vex",
         description: "Add a team to the Vex tracker",

@@ -23,10 +23,11 @@ This is Magna bot!
   - [x] Sakoban (H)
 - [ ] Music (H)
   - [x] Play
-  - [ ] Stop
-  - [ ] Pause
-  - [ ] Skip
-  - [ ] Sneek
+  - [x] Pause
+  - [x] Skip
+  - [ ] Sneek (Might not be possible)
+  - [ ] Spotify Support
+  - [ ] YouTube Playlist Support ?
 - [ ] Ecom (VL)
   - [ ] Global Ecom
   - [ ] Server Ecom
