@@ -35,6 +35,7 @@ This is Magna bot!
   - [ ] Marry
   - [ ] Adpot
   - [ ] 👁️👁️
+- [ ] Database ( Our current database is a JSON database, it will remain a json database system, however this will only be on the server, not this apps data )
   
 ### Priority Codes
 

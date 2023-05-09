@@ -18,4 +18,18 @@ for (var eventFName of eventsDir) {
     }
 }
 
+bot.on("error", (err)=>{
+    console.log("DISCORD BOT ERROR!!!!")
+    console.log(err)
+})
+
+bot.on("disconnect", ()=>{
+    bot.connect()
+})
+
+bot.on("warn", (warn)=>{
+    console.log("DISCORD BOT WARN!!!!")
+    console.log(warn)
+})
+
 bot.connect()

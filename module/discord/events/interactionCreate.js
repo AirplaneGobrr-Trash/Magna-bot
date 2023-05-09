@@ -9,6 +9,7 @@ module.exports = {
      * @param {client} bot 
      */
     async execute(interaction, bot){
+        if (!bot.loadedCommands) return interaction.createMessage({ content: "Bot starting...", flags: 64 })
         // console.log(interaction)
         if (interaction instanceof eris.CommandInteraction) {
             let commandName = interaction.data.name

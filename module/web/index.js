@@ -3,6 +3,7 @@ const apiB = require('../twitch/api');
 const utils = require('../helpers/utils')
 
 const path = require('path')
+const fs = require("fs")
 
 const dbBuilder = require("@airplanegobrr/database")
 const db = new dbBuilder()
@@ -11,79 +12,13 @@ const { parentPort, BroadcastChannel } = require("worker_threads")
 
 const bc = new BroadcastChannel("com")
 
-const streamerAPI = new apiB({
-    clientID: "y32z2hefjjijzxcpv3md5x4ee4ngvu",
-    clientSecret: "vc564cqo3q8co44nm22z355rmhlour",
-    callbackURL: "https://magna.airplanegobrr.xyz/auth/twitch/callback",
-    scopes: [
-        "analytics:read:extensions",
-        "analytics:read:games",
-        "bits:read",
-        "channel:edit:commercial",
-        "channel:manage:broadcast",
-        "channel:read:charity",
-        "channel:manage:extensions",
-        "channel:manage:moderators",
-        "channel:manage:polls",
-        "channel:manage:predictions",
-        // "channel:manage:raids",
-        "channel:manage:redemptions",
-        "channel:manage:schedule",
-        "channel:manage:videos",
-        "channel:read:editors",
-        "channel:read:goals",
-        "channel:read:hype_train",
-        "channel:read:polls",
-        "channel:read:predictions",
-        "channel:read:redemptions",
-        // "channel:read:stream_key",
-        "channel:read:subscriptions",
-        "channel:read:vips",
-        "channel:manage:vips",
-        "clips:edit",
-        // "moderation:read",
-        // "moderator:manage:announcements",
-        // "moderator:manage:automod",
-        // "moderator:read:automod_settings",
-        // "moderator:manage:automod_settings",
-        // "moderator:manage:banned_users",
-        // "moderator:read:blocked_terms",
-        // "moderator:manage:blocked_terms",
-        // "moderator:manage:chat_messages",
-        // "moderator:read:chat_settings",
-        // "moderator:manage:chat_settings",
-        // "moderator:read:chatters",
-        // "moderator:read:followers",
-        // "moderator:read:shield_mode",
-        // "moderator:manage:shield_mode",
-        // "moderator:read:shoutouts",
-        // "moderator:manage:shoutouts",
-        // "user:edit",
-        // "user:edit:follows",
-        // "user:manage:blocked_users",
-        // "user:read:blocked_users",
-        "user:read:broadcast",
-        "user:manage:chat_color",
-        "user:read:email",
-        "user:read:follows",
-        "user:read:subscriptions",
-        "user:manage:whispers",
-        "channel:moderate",
-        "chat:edit",
-        "chat:read",
-        // "whispers:read",
-        // "whispers:edit"
-    ]
-});
-
-const baseAPI = new apiB({
-    clientID: "y32z2hefjjijzxcpv3md5x4ee4ngvu",
-    clientSecret: "vc564cqo3q8co44nm22z355rmhlour",
-    callbackURL: "https://magna.airplanegobrr.xyz/auth/twitch/callback",
-    scopes: [
-        "user:read:email"
-    ]
-})
+bc.onmessage = (event) => {
+    const data = event.data
+    if (data.type == "webplayerSync") {
+        // console.log("sending message: ", data)
+        io.to(data.guild.toString()).emit("webplayerSync", data)
+    }
+}
 
 async function authMake(oldToken = null){
     if (oldToken && await db.has(`users.${oldToken}`)) await db.delete(`users.${oldToken}`)
@@ -130,66 +65,39 @@ async function authCheck(req, res, next) {
     }
 }
 
-app.get('/', authCheck, async (req, res) => {
-    console.log(req.twitch)
-    var twitchMessage = ""
-    if (req.twitch){
-        twitchMessage = `Twitch: ${req.twitch.display_name}, `
+app.use("/login", (require("./routes/login")))
+
+app.get("/", (req, res)=>{
+    // res.render("t")
+    res.send("Not done, This will act as a config system as well as a video player for the songs")
+})
+
+app.get("/room/:id", (req, res)=>{
+    res.render("room", {
+        serverID: req.params.id
+    })
+})
+
+app.get("/song/:song", (req, res)=>{
+    const filePath = path.join(__dirname, "..", "..", "data", "songs", `${req.params.song}.mp4`)
+    // check for file
+    if (fs.existsSync(filePath)){
+        res.sendFile(filePath)
     } else {
-        twitchMessage = "You currently are not logged in, login <a href='/auth/twitch'>here</a>"
+        res.send("Not Found!")
     }
-    res.send(`Hello ${req.token}, ${twitchMessage}`)
-});
+})
 
 app.get("/streamScript", (req, res) => {
     res.sendFile(path.join(__dirname,"..", "extension", "stream.js"))
 })
 
-app.get('/auth/twitch', authCheck, (req, res) => {
-    if (req.query.streamer) return res.redirect(streamerAPI.getAccessURL())
-    res.redirect(baseAPI.getAccessURL()) 
-});
-
-app.get('/twitch', authCheck, async (req, res) => {
-    res.send(`Looks like you are logged in as ${req?.twitch?.display_name}, You should see a message in your twitch chat!`)
-})
-app.get("/twitch/user", authCheck, async (req, res) => {
-    try {
-        const tokenData = await db.get(`users.${req.token}.twitch.auth`)
-        const user = await baseAPI.users(tokenData.access_token, req.query.user)
-        res.json(user)
-    } catch (error) {
-        console.log(error)
-        res.send("Error")
-    }
-})
-
-app.get('/auth/twitch/callback', authCheck, async (req, res) => {
-    try {
-        var tk = await baseAPI.getAccessToken(req.query.code)
-        if (tk) {
-            const token = req.cookies.token
-            const user = (await baseAPI.users(tk.access_token)).data[0]
-            // console.log(user, tk)
-            await db.set(`users.${token}.twitch.auth`, tk)
-            if (user) {
-                await db.set(`users.${token}.twitch.user`, user)
-                await db.set(`twitch.${user.login}.webID`, token)
-                bc.postMessage({type: "sendMessage", message: "Linked!", channel: user.login})
-            }
-
-            res.redirect("/twitch")
-        } else {
-            res.status(500).send('error')
-        }
-    } catch (err) {
-        console.log(err)
-        // res.redirect('/auth/twitch')
-    }
-})
-
 io.on('connection', (socket) => {
-    console.log('a user connected');
+    console.log('a user connected', socket.handshake.auth);
+    if (socket.handshake.auth.server) {
+        console.log("Sending to server", socket.handshake.auth.server)
+        socket.join(socket.handshake.auth.server.toString())
+    }
 });
 
 server.listen(3000, () => {

@@ -38,13 +38,13 @@ module.exports = {
         // await interaction.createMessage({tts: true, content: "Test!"})
         // await interaction.createFollowup({tts: true, content: "Test!", flags: 64})
         let options = {}
-        if (interaction.data.options) for (var opt of interaction.data.options) {
+        if (interaction.data.options) for (let opt of interaction.data.options) {
             options[opt.name] = opt.value ?? opt
         }
 
-        var gaTmp = new sokoban()
-        var serverDB = await dataHelper.server.database.getSokoban(interaction.guildID)
-        var gameUUID = utils.generateUUID()
+        let gaTmp = new sokoban()
+        let serverDB = await dataHelper.server.database.getSokoban(interaction.guildID)
+        let gameUUID = utils.generateUUID()
         await gaTmp.gen(0)
         await interaction.createMessage({
             embed: {

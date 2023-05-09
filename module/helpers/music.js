@@ -10,6 +10,7 @@ const songsPath = path.join(mainDataPath, "songs")
 fs.mkdirSync(songsPath, { recursive: true })
 
 const Client = require("./clientBuilder")
+const { BroadcastChannel } = require("worker_threads")
 
 const { spotify } = require("../../config.json");
 const Eris = require('eris');
@@ -40,11 +41,6 @@ async function renewSpotify() {
         }
     ).catch(e => { })
 }
-
-renewSpotify()
-setInterval(() => {
-    renewSpotify()
-}, 120 * 1000)
 
 const isValidUrl = urlString => {
     var urlPattern = new RegExp('^(https?:\\/\\/)?' + // validate protocol
@@ -110,27 +106,47 @@ class music {
      */
     constructor(bot) {
         this.spotify = new spotifyC()
-
+        this.bc = new BroadcastChannel("com")
+        renewSpotify()
+        setInterval(() => {
+            renewSpotify()
+        }, 120 * 1000)
+        
         setInterval(async () => {
             if (!bot.ready) return
             const servers = bot.guilds
             for (var serverID of servers.keys()) {
-                if (await dataHelper.server.song.check(serverID)) {
+                var vc = bot.voiceConnections.get(serverID)
+
+                // Checks if we have songs pending OR if we are in a VC (and its ready)
+                if (await dataHelper.server.song.check(serverID) || (vc && vc?.ready)) {
                     // console.log(serverID, "Has song(s) in line!")
                     // console.log(bot.guilds.get(serverID).voiceStates)
-
-                    var vc = bot.voiceConnections.get(serverID)
-                    const voiceChannelID = await (await dataHelper.server.database.getSong(serverID)).get("channel")
+                    const songServerDB = await dataHelper.server.database.getSong(serverID)
+                    const voiceChannelID = await songServerDB.get("channel")
                     // console.log("channel",voiceChannelID)
                     if (!vc) vc = await bot.joinVoiceChannel(voiceChannelID)
                     // console.log("Voice status", "Playing", vc?.playing, "Paused", vc?.paused, "Timestamp", vc?.current?.playTime)
-                    if (vc && vc.ready && !vc.playing && !vc.paused) {
-                        const song = await dataHelper.server.song.getNext(serverID)
-                        var songPath = path.join(songsPath, `${song}.mp4`)
-                        vc.play(songPath, { inlineVolume: true })
+                    if (vc && vc.ready) {
+                        if (!vc.playing && !vc.paused) {
+                            const song = await dataHelper.server.song.getNext(serverID)
+                            var songPath = path.join(songsPath, `${song}.mp4`)
+                            vc.play(songPath, { inlineVolume: true })
+                        }
+
+                        // Web sync
+                        if (vc.playing || vc.paused) {
+                            this.bc.postMessage({
+                                type: "webplayerSync",
+                                song: await songServerDB.get("currentSong"),
+                                paused: vc.paused,
+                                timestamp: vc?.current?.playTime,
+                                guild: serverID,
+                                channel: vc.channelID
+                            })
+                        }
 
                         // console.log("Playing", song, songPath, await duration(songPath) * 1009)
-
                     }
                 }
             }
