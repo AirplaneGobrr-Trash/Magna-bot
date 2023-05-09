@@ -1,0 +1,32 @@
+<video id="player"></video>
+
+<script src='/socket.io/socket.io.js'></script>
+<script>
+    const serverID = "{{{ serverID }}}"
+    const socket = io({
+        auth: {
+            server: serverID.toString()
+        }
+    });
+
+    const player = document.createElement("video")
+    document.body.append(player)
+    player.controls = true
+    player.autoplay = true
+
+
+    function isWithinThreshold(playerTime, timestamp) {
+        const threshold = 0.1; // 2 seconds
+        const diff = Math.abs(playerTime - timestamp);
+        return diff <= threshold;
+    }
+
+    socket.on("webplayerSync", (data) => {
+        console.log(player)
+        if (!player.src.includes(data.song)) player.src = `/song/${data.song}`
+        var timestamp = data.timestamp / 1000
+        console.log("p", player.currentTime, "t", timestamp)
+        player.currentTime = timestamp
+        player.play()
+    })
+</script>

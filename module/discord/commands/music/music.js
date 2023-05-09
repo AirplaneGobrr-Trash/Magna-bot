@@ -67,12 +67,6 @@ module.exports = {
      * @param {client} bot 
      */
     async execute(interaction, bot) {
-        // await interaction.createMessage({tts: true, content: "Test!"})
-        // await interaction.createFollowup({tts: true, content: "Test!", flags: 64})
-        // let options = {}
-        // if (interaction.data.options) for (var opt of interaction.data.options) {
-        //     options[opt.name] = opt.value ?? opt
-        // }
         const options = await optionsPraser(interaction.data.options)
         const command = Object.keys(options)[0]
         // console.log("CommandOptions", command, options)
@@ -81,18 +75,18 @@ module.exports = {
                 break
             }
             case "clear": {
-                var vc = bot.voiceConnections.get(interaction.guildID)
+                let vc = bot.voiceConnections.get(interaction.guildID)
                 if (vc) {
-                    var serverDB = await dataHelper.discord.server.database.getSong(interaction.guildID)
+                    let serverDB = await dataHelper.discord.server.database.getSong(interaction.guildID)
                     await serverDB.set("songs", [])
-                    await vc.stopPlaying()
+                    vc.stopPlaying()
                     await interaction.createMessage("Cleared queue!")
                     break
                 }
                 break
             }
             case "pause": {
-                var vc = bot.voiceConnections.get(interaction.guildID)
+                let vc = bot.voiceConnections.get(interaction.guildID)
                 if (vc) {
                     if (vc.paused) {
                         vc.resume()
@@ -106,7 +100,7 @@ module.exports = {
                 break
             }
             case "volume": {
-                var vc = bot.voiceConnections.get(interaction.guildID)
+                let vc = bot.voiceConnections.get(interaction.guildID)
                 if (vc) {
                     vc.setVolume(options[command].volume)
                     await interaction.createMessage("Set volume to " + options[command].volume)
@@ -126,9 +120,9 @@ module.exports = {
                 break
             }
             case "skip": {
-                var vc = bot.voiceConnections.get(interaction.guildID)
+                let vc = bot.voiceConnections.get(interaction.guildID)
                 if (vc) {
-                    await vc.stopPlaying()
+                    vc.stopPlaying()
                     await interaction.createMessage("Skiped song!")
                     break
                 }
