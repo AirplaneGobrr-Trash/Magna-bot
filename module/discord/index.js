@@ -33,3 +33,6 @@ bot.on("warn", (warn)=>{
 })
 
 bot.connect()
+process.memoryUsage()
+process.uptime()
+process.resourceUsage()
