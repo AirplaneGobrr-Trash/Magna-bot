@@ -1,5 +1,7 @@
 const { BroadcastChannel } = require("worker_threads");
 const bc = new BroadcastChannel("update")
+const v8 = require('v8');
+
 
 function getFile() {
     let raw = require.main.filename
@@ -18,8 +20,8 @@ setInterval(() => {
         
         processData: {
             cpuUsage: process.cpuUsage(),
-            memory: process.memoryUsage(),
-            uptime: process.uptime()
+            memory: v8.getHeapStatistics(),
+            uptime: process.hrtime()
         }
     })
 }, 100);
