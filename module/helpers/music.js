@@ -131,7 +131,12 @@ class music {
                         if (!vc.playing && !vc.paused) {
                             const song = await dataHelper.server.song.getNext(serverID)
                             var songPath = path.join(songsPath, `${song}.mp4`)
-                            vc.play(songPath, { inlineVolume: true })
+                            if (fs.existsSync(songPath)) {
+                                vc.play(songPath, { inlineVolume: true })
+                            } else {
+                                console.log("Big error, can't find file!")
+                            }
+                            
                         }
 
                         // Web sync
@@ -202,7 +207,7 @@ class music {
                             }
 
                         }).on("error", (err) => {
-                            console.log(err);
+                            console.log("discord song download error", err);
                             return resolve({ file: null, action: "error"})
                         })
                     }
@@ -285,7 +290,7 @@ class music {
                 if (!_shutUp) await _interaction.createFollowup(`Added ${Object.keys(videoInfo).length} songs`)
                 return
             } else {
-                console.log(song, urlData, videoInfo)
+                // console.log(song, urlData, videoInfo)
                 if (videoInfo.action == "error" && !_shutUp) return await _interaction.createFollowup("Error downloading song!")
                 if (!_shutUp) await _interaction.createFollowup(`Using ${videoInfo.action} for ${song}`)
                 await dataHelper.server.song.add(guildID, channelID, videoInfo.file)

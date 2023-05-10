@@ -2,7 +2,7 @@ const express = require("express")
 const route = express.Router()
 
 app.get('/2', authCheck, async (req, res) => {
-    console.log(req.twitch)
+    
     var twitchMessage = ""
     if (req.twitch){
         twitchMessage = `Twitch: ${req.twitch.display_name}, `
@@ -52,7 +52,7 @@ app.get('/auth/twitch/callback', authCheck, async (req, res) => {
             res.status(500).send('error')
         }
     } catch (err) {
-        console.log(err)
+        console.log("twith erorr", err)
         // res.redirect('/auth/twitch')
     }
 })

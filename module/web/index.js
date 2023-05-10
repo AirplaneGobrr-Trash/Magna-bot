@@ -1,3 +1,5 @@
+require("../helpers/processUpdater")
+
 const { app, express, http, io, server } = require('./web')
 const apiB = require('../twitch/api');
 const utils = require('../helpers/utils')
@@ -44,7 +46,7 @@ async function authCheck(req, res, next) {
                     return next()
                 }).catch(err => {
                     // Get status code of error
-                    console.log(err.response)
+                    console.log("web error", err.response)
                     return next()
                 })
             } else return next()

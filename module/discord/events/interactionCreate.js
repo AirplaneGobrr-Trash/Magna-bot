@@ -16,7 +16,7 @@ module.exports = {
             let command = bot.loadedCommands.get(commandName)
             if (command) {
                 try { command.execute(interaction, bot) } catch (e) {
-                    console.log(e)
+                    console.log("discord int error", e)
                     if (!interaction.acknowledged) await interaction.createMessage({ tts: true, content: "Error trying to execute", flags: 64 })
                 }
             } else {

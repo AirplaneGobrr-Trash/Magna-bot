@@ -1,0 +1,65 @@
+<h1>Admin panel</h1>
+<style>
+    #grid {
+        display: grid;
+        grid-template-columns: auto auto auto
+    }
+</style>
+
+<div id="grid"></div>
+
+<script>
+    const grid = document.getElementById("grid");
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    var pass = `?pass=${urlParams.get("pass")}`
+
+    setInterval(() => {
+        fetch(`/data${pass}`).then(res=>res.json()).then((data)=>{
+            console.log(data)
+            for (let service in data){
+                let elm = document.getElementById(service)
+                if (!elm) {
+                    elm = document.createElement("div")
+                    elm.id = service
+                    const name = document.createElement("h1")
+                    name.innerText = service
+                    const data = document.createElement("b")
+                    data.innerText = JSON.stringify(data[service], null, 2)
+
+                    const status = document.createElement("p")
+
+                    const startBTN = document.createElement("button")
+                    startBTN.innerText = "Start"
+                    startBTN.onclick = (e) => {
+                        e.preventDefault()
+                        console.log("Start")
+                        fetch(`/start/${service}${pass}`).then(()=>{})
+                    }
+
+                    const stopBTN = document.createElement("button")
+                    stopBTN.innerText = "Stop"
+                    stopBTN.onclick = (e) => {
+                        e.preventDefault()
+                        console.log("Stop")
+                        fetch(`/stop/${service}${pass}`).then(()=>{})
+                    }
+
+                    const restartBTN = document.createElement("button")
+                    restartBTN.innerText = "Restart"
+                    restartBTN.onclick = (e) => {
+                        e.preventDefault()
+                        console.log("Restart")
+                        fetch(`/restart/${service}${pass}`).then(()=>{})
+                    }
+
+                    grid.append(elm)
+                    elm.append(name, data, "", status,startBTN, stopBTN, restartBTN )
+                } else {
+                    elm.querySelectorAll("b").forEach(elm => elm.innerText = JSON.stringify(data[service], null, 2))
+                    elm.querySelectorAll("p").forEach(elm => elm.innerText = `Status: ${data[service]?.status}`)
+                }
+            }
+        })
+    }, 500)
+</script>

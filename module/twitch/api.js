@@ -13,7 +13,7 @@ class TwitchAPI {
     constructor(options = {}) {
         this.options = options
 
-        console.log(this.options)
+        // console.log(this.options)
 
         this.clientID = options.clientID
         this.clientSecret = options.clientSecret
