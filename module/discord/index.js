@@ -1,3 +1,5 @@
+require("../helpers/processUpdater")
+
 const { discord: config } = require("../../config.json")
 const Client = require("../helpers/clientBuilder")
 // const { Client } = require("eris")
@@ -33,6 +35,3 @@ bot.on("warn", (warn)=>{
 })
 
 bot.connect()
-process.memoryUsage()
-process.uptime()
-process.resourceUsage()

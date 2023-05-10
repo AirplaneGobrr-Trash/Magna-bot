@@ -1,3 +1,5 @@
+require("../helpers/processUpdater")
+
 const dBuilder = require("@airplanegobrr/database")
 const path = require("path")
 const dbPath = path.join(__dirname, "..", "..", "data", "twitch")
@@ -33,9 +35,7 @@ bc.onmessage = async (event) => {
 
 // This function will return the object and the index
 function findObjectValueInArray(array, key, value) {
-    console.log(array, key, value)
     for (var objIndex in array) {
-        console.log(objIndex, array[objIndex], array[objIndex][key])
         if (array[objIndex][key] == value) {
             return {
                 obj: array[objIndex],

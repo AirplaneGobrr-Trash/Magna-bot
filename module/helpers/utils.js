@@ -72,7 +72,7 @@ async function bCheck(client) {
                 var bumpRoleID = ""
                 if (bumpInfo?.bumpRole) bumpRoleID = `<@&${bumpInfo?.bumpRole}>`; else bumpRoleID = "No Bump role set!"
                 if (bumpInfo?.bumpChannel) var bumpChannel = client.getChannel(bumpInfo?.bumpChannel)
-                console.log(bumpInfo?.bumpChannel)
+                // console.log(bumpInfo?.bumpChannel)
                 if (!bumpChannel) continue
                 bumpChannel.createMessage({
                     embed: {
