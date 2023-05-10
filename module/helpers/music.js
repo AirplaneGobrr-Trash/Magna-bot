@@ -179,7 +179,7 @@ class music {
                         console.log("Using cached file")
                         return resolve({ file: fileName, action: "cache"})
                     } else {
-                        const stream = yt_download(url.url, { quality: "highest" });
+                        const stream = yt_download(url.url, { quality: "highestaudio" });
 
                         // `./data/songs/${fileName}.mp4`
 
