@@ -130,6 +130,7 @@ class music {
                     if (vc && vc.ready) {
                         if (!vc.playing && !vc.paused) {
                             const song = await dataHelper.server.song.getNext(serverID)
+                            if (!song) return
                             var songPath = path.join(songsPath, `${song}.mp4`)
                             if (fs.existsSync(songPath)) {
                                 vc.play(songPath, { inlineVolume: true })
