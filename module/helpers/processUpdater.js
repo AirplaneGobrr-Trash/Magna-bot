@@ -12,8 +12,12 @@ function getFile() {
     return raw.pop();
 }
 const me = getFile()
+const startTime = new Date()
 
 setInterval(() => {
+    const currentTime = new Date();
+    const elapsedTime = (currentTime - startTime) / 1000;
+
     bc.postMessage({
         service: me,
         type: "update",
@@ -21,7 +25,7 @@ setInterval(() => {
         processData: {
             cpuUsage: process.cpuUsage(),
             memory: v8.getHeapStatistics(),
-            uptime: process.hrtime()
+            uptime: elapsedTime
         }
     })
 }, 100);
