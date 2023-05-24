@@ -36,6 +36,7 @@ This is Magna bot!
   - [ ] Adpot
   - [ ] 👁️👁️
 - [ ] Database ( Our current database is a JSON database, it will remain a json database system, however this will only be on the server, not this apps data )
+- [ ] Switch to Interactions Endpoint URL POST ( maybe, this is not final *yet*. )
   
 ### Priority Codes
 
