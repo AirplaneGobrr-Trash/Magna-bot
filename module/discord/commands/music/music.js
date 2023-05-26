@@ -57,6 +57,19 @@ module.exports = {
                 name: "pause",
                 description: "Toggles if playing or paused for the current song",
                 type: Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
+            },
+            {
+                name: "loop",
+                description: "Toggles loop mode",
+                type: Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
+                options: [
+                    {
+                        name: "enabled", //The name of the option
+                        description: "Weather to enable or disable loop",
+                        type: Constants.ApplicationCommandOptionTypes.BOOLEAN, //This is the type of string, see the types here https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type
+                        required: true
+                    }
+                ]
             }
         ]
     },
@@ -123,6 +136,17 @@ module.exports = {
                 let vc = bot.voiceConnections.get(interaction.guildID)
                 if (vc) {
                     vc.stopPlaying()
+                    await interaction.createMessage("Skiped song!")
+                    break
+                }
+                await interaction.createMessage("Not playing!")
+                break
+            }
+            case "loop": {
+                let vc = bot.voiceConnections.get(interaction.guildID)
+                if (vc) {
+                    vc.stopPlaying()
+                    bot.music.enableMode()
                     await interaction.createMessage("Skiped song!")
                     break
                 }
