@@ -127,11 +127,11 @@ class music {
                     // console.log("channel",voiceChannelID)
                     if (!vc) vc = await bot.joinVoiceChannel(voiceChannelID)
                     // console.log("Voice status", "Playing", vc?.playing, "Paused", vc?.paused, "Timestamp", vc?.current?.playTime)
-                    if (vc && vc.ready) {
+                    if (vc.ready) {
                         if (!vc.playing && !vc.paused) {
                             const song = await dataHelper.server.song.getNext(serverID)
                             if (!song) return
-                            var songPath = path.join(songsPath, `${song}.mp4`)
+                            var songPath = path.join(songsPath, song, "audio.mp3")
                             if (fs.existsSync(songPath)) {
                                 vc.play(songPath, { inlineVolume: true })
                             } else {
@@ -174,30 +174,35 @@ class music {
                     let videoID = yt_download.getURLVideoID(url.url)
 
                     const outputFolder = path.join(songsPath, videoID)
-                    const output_video = path.join()
-                    const output_audio = path.join()
+                    const output_video = path.join(outputFolder, "video.mp4")
+                    const output_audio = path.join(outputFolder, "audio.mp3")
 
                     // check if the file exists
-                    if (fs.existsSync(outputFolder)) {
+                    if (fs.existsSync(output_video) && fs.existsSync(output_audio)) {
                         console.log("Using cached file")
                         return resolve({ file: videoID, action: "cache"})
                     } else {
+                        fs.mkdirSync(outputFolder, {recursive:true})
                         const audioStream = yt_download(url.url, { quality: "highestaudio" });
                         const videoStream = yt_download(url.url, { quality: "highestvideo" });
 
                         // `./data/songs/${videoID}/video.mp4`
 
-                        const videoDLData = { error: false, started: false, process: null }
-                        const audioDLData = { error: false, started: false, process: null }
+                        const videoDLData = { error: false, done: false, process: null }
+                        const audioDLData = { error: false, done: false, process: null }
 
                         var inter = setInterval(async ()=>{
                             if (videoDLData.error && audioDLData.error) return resolve({ file: null, action: "error"})
+                            if (videoDLData.done && audioDLData.done) {
+                                clearInterval(inter)
+                                return resolve({ file: videoID, action: "download"})
+                            }
                         }, 100)
 
                         videoStream.pipe(fs.createWriteStream(output_video));
 
                         videoStream.on('end', async () => {
-                            return resolve({ file: fileName, action: "download"})
+                            videoDLData.done = true
                         }).on("progress", async (chunkLength, downloaded, total) => {
                             var MB = downloaded / 1000000;
                             var MBTotal = total / 1000000;
@@ -209,18 +214,19 @@ class music {
                             console.debug(this.comment);
 
                             if (percent == 100) {
-                                resolve({ file: videoID, action: "download"})
+                                videoDLData.done = true
                             }
+                            videoDLData.process = percent
 
                         }).on("error", (err) => {
-                            console.log("discord song download error", err);
-                            return resolve({ file: null, action: "error"})
+                            console.log("discord VIDEO download error", err);
+                            videoDLData.error = true
                         })
 
                         audioStream.pipe(fs.createWriteStream(output_audio));
 
                         audioStream.on('end', async () => {
-                            return resolve({ file: fileName, action: "download"})
+                            audioDLData.done = true
                         }).on("progress", async (chunkLength, downloaded, total) => {
                             var MB = downloaded / 1000000;
                             var MBTotal = total / 1000000;
@@ -232,12 +238,13 @@ class music {
                             console.debug(this.comment);
 
                             if (percent == 100) {
-                                resolve({ file: videoID, action: "download"})
+                                audioDLData.done = true
                             }
+                            audioDLData.process = percent
 
                         }).on("error", (err) => {
-                            console.log("discord song download error", err);
-                            return resolve({ file: null, action: "error"})
+                            console.log("discord AUDIO download error", err);
+                            audioDLData.error = true
                         })
                     }
                 })

@@ -25,6 +25,7 @@
         console.log(player)
         if (!player.src.includes(data.song)) player.src = `/song/${data.song}`
         var timestamp = data.timestamp / 1000
+        if (isWithinThreshold(player.currentTime, timestamp)) return
         console.log("p", player.currentTime, "t", timestamp)
         player.currentTime = timestamp
         player.play()

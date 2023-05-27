@@ -81,13 +81,20 @@ app.get("/room/:id", (req, res)=>{
 })
 
 app.get("/song/:song", (req, res)=>{
-    const filePath = path.join(__dirname, "..", "..", "data", "songs", `${req.params.song}.mp4`)
+    const filePath = path.join(__dirname, "..", "..", "data", "songs", req.params.song)
+    const videoPath = path.join(filePath, "video.mp4")
+    const audioPath = path.join(filePath, "audio.mp3")
     // check for file
-    if (fs.existsSync(filePath)){
-        res.sendFile(filePath)
-    } else {
+    if (!fs.existsSync(videoPath) && !fs.existsSync(audioPath)){
         res.send("Not Found!")
     }
+
+    if (req.query.audio) {
+        res.sendFile(audioPath)
+    } else {
+        res.sendFile(videoPath)
+    }
+    
 })
 
 app.get("/streamScript", (req, res) => {
