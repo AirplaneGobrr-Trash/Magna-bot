@@ -123,7 +123,7 @@ module.exports = {
 
                 break
             }
-            case "add": {
+            case "play": {
                 if (interaction.member.voiceState.channelID) {
                     await interaction.createMessage("Looking up `" + options[command].song + "`")
                     await bot.music.add(options[command].song, interaction.guildID, interaction.member.voiceState.channelID, bot, interaction)
