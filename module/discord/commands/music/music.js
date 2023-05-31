@@ -13,8 +13,8 @@ module.exports = {
         // type: Constants.ApplicationCommandTypes.CHAT_INPUT,
         options: [ //An array of Chat Input options https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
             {
-                name: "play",
-                description: "Play a song!",
+                name: "add",
+                description: "Add a song!",
                 type: Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
                 options: [
                     {
