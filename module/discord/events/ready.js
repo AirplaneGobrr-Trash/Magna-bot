@@ -52,6 +52,20 @@ module.exports = {
         } 
 
         bot.loadedCommands = loadedCommands
+        var botCommands = []
+        for (var command of commands) {
+            botCommands.push(command.name)
+        }
+
+        let difference = botCommands.filter(x => !loadedCommands.has(x));
+        if (difference.length > 0) {
+            
+            for (var commandName of difference){
+                var commandData = commands.find(e => e.name == commandName)
+                await bot.deleteCommand(commandData.id)
+            }
+            
+        }
         var pause = false
         setInterval(async ()=>{
             if (!pause) {
