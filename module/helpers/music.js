@@ -200,7 +200,8 @@ class music {
             if (Array.isArray(url)) {
                 var outs = []
                 for (var i of url) {
-                    var d = await this.download(i.url)
+                    var d = await this.download({url: i.url})
+                    console.log(d)
                     outs.push(d)
                 }
                 return outs
@@ -364,6 +365,7 @@ class music {
             if (Array.isArray(videoInfo)) {
                 var big = ""
                 for (var data of videoInfo) {
+                    console.log(data, videoInfo)
                     if (videoInfo.action == "error") continue
                     await dataHelper.server.song.add(guildID, channelID, data.file)
                 }
