@@ -17,6 +17,7 @@ specifiers:
   socket.io: ^4.6.1
   socket.io-client: ^4.6.1
   spotify-web-api-node: ^5.0.2
+  string-progressbar: ^1.0.4
   tmi.js: ^1.8.5
   yt-search: ^2.10.4
   ytdl-core: ^4.11.4
@@ -38,6 +39,7 @@ dependencies:
   socket.io: 4.6.1
   socket.io-client: 4.6.1
   spotify-web-api-node: 5.0.2
+  string-progressbar: 1.0.4
   tmi.js: 1.8.5
   yt-search: 2.10.4
   ytdl-core: 4.11.4
@@ -1919,6 +1921,10 @@ packages:
   /statuses/2.0.1:
     resolution: {integrity: sha512-RwNA9Z/7PrK06rYLIzFMlaF+l73iwpzsqRIFgbMLbTcLD6cOao82TaWefPXQvB2fOC4AjuYSEndS7N/mTCbkdQ==}
     engines: {node: '>= 0.8'}
+    dev: false
+
+  /string-progressbar/1.0.4:
+    resolution: {integrity: sha512-OpkcFxlFjn7kz5jTWmPGY+FFJVN21lQ9k0fkK0XS5GVvlCgS1stgDNEoMyqnkbZEcVP3Gv6IxqgG7tnD7ChBSw==}
     dev: false
 
   /string-width/2.1.1:

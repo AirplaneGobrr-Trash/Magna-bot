@@ -35,7 +35,7 @@ bot.on("warn", (warn)=>{
 })
 
 process.on("uncaughtException", (err)=>{
-    if (err?.message.includes("1006")) bot.connect()
+    if (err?.message.includes("1006")) bot.connect(); else console.log(err)
 })
 
 bot.connect()

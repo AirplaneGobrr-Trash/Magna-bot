@@ -67,10 +67,36 @@ module.exports = {
                         name: "enabled", //The name of the option
                         description: "Weather to enable or disable loop",
                         type: Constants.ApplicationCommandOptionTypes.BOOLEAN, //This is the type of string, see the types here https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type
+                        required: false
+                    }
+                ]
+            },
+            {
+                name: "textchannel",
+                description: "Sets the song channel, can be set to force use with stricttextmode",
+                type: Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
+                options: [
+                    {
+                        name: "channel", //The name of the option
+                        description: "Song channel",
+                        type: Constants.ApplicationCommandOptionTypes.CHANNEL, //This is the type of string, see the types here https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type
                         required: true
                     }
                 ]
-            }
+            },
+            {
+                name: "stricttextmode",
+                description: "Makes it so music commands will only work in one channel",
+                type: Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
+                options: [
+                    {
+                        name: "enabled", //The name of the option
+                        description: "Weather to enable or disable strict text mode.",
+                        type: Constants.ApplicationCommandOptionTypes.BOOLEAN, //This is the type of string, see the types here https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type
+                        required: true
+                    }
+                ]
+            },
         ]
     },
 
@@ -82,6 +108,12 @@ module.exports = {
     async execute(interaction, bot) {
         const options = await optionsPraser(interaction.data.options)
         const command = Object.keys(options)[0]
+        const serverDB = await dataHelper.discord.server.database.getSong(interaction.guildID)
+        const channel = await serverDB.get("textChannel")
+        const strict = await serverDB.get("strict")
+
+        if (strict && (command != "textchannel" || command != "stricttextmode") && interaction.channel.id != channel) return interaction.createMessage({ flags: 64, content: `This server has strict mode on, please use <#${channel}> to do commands!`})
+
         // console.log("CommandOptions", command, options)
         switch (command) {
             case "queue": {
@@ -90,7 +122,6 @@ module.exports = {
             case "clear": {
                 let vc = bot.voiceConnections.get(interaction.guildID)
                 if (vc) {
-                    let serverDB = await dataHelper.discord.server.database.getSong(interaction.guildID)
                     await serverDB.set("songs", [])
                     vc.stopPlaying()
                     await interaction.createMessage("Cleared queue!")
@@ -143,14 +174,24 @@ module.exports = {
                 break
             }
             case "loop": {
-                let vc = bot.voiceConnections.get(interaction.guildID)
-                if (vc) {
-                    vc.stopPlaying()
-                    bot.music.enableMode()
-                    await interaction.createMessage("Skiped song!")
+                if (interaction.member.voiceState.channelID) {
+                    var stat = await bot.music.enableMode(interaction.guildID, 1, options[command]?.enabled ?? null)
+                    await interaction.createMessage(stat ? "Loop mode is now on!" : "Loop mode is now off.")
                     break
                 }
-                await interaction.createMessage("Not playing!")
+                await interaction.createMessage("Not in VC!")
+                break
+            }
+            case "textchannel": {
+                var c = options[command].channel
+                await serverDB.set("textChannel", c)
+                await interaction.createMessage({ flags:64, content: `Channel is now set to <#${c}>`})
+                break
+            }
+            case "stricttextmode": {
+                var e = options[command].enabled
+                await serverDB.set("strict", e)
+                await interaction.createMessage({ flags:64, content: `Strict mode is now ${e ? "on" : "off"}.`})
                 break
             }
         }

@@ -26,6 +26,7 @@
     "socket.io": "^4.6.1",
     "socket.io-client": "^4.6.1",
     "spotify-web-api-node": "^5.0.2",
+    "string-progressbar": "^1.0.4",
     "tmi.js": "^1.8.5",
     "yt-search": "^2.10.4",
     "ytdl-core": "^4.11.4"
