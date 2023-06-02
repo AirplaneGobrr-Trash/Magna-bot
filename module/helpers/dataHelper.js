@@ -1,6 +1,8 @@
 const fs = require("fs")
 const path = require("path")
 const dbBuilder = require("@airplanegobrr/database")
+const { getVideoDurationInSeconds: duration } = require('get-video-duration')
+
 
 const mainDataPath = path.join(__dirname, "..", "..", "data")
 
@@ -44,6 +46,7 @@ const discord_server = {
             if (!song) return null
             await serverDB.set("songs", songs)
             await serverDB.set("currentSong", song)
+            await serverDB.set("currentSongDur", await duration(path.join(mainDataPath, "songs", song, "audio.mp3")) * 1009)
             return song
         },
         async getQueue(serverID) {

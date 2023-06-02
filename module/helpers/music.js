@@ -1,5 +1,5 @@
-const { getVideoDurationInSeconds: duration } = require('get-video-duration')
 const SpotifyWebApi = require('spotify-web-api-node');
+const progressbar = require('string-progressbar');
 const yt_download = require("ytdl-core")
 const yt_Search = require("yt-search")
 const path = require("path")
@@ -107,56 +107,91 @@ class music {
     constructor(bot) {
         this.spotify = new spotifyC()
         this.bc = new BroadcastChannel("com")
+        this.counter = 0
+        this.loopRunning = false
+        this.bot = bot
         renewSpotify()
         setInterval(() => {
             renewSpotify()
         }, 120 * 1000)
-        
+
         setInterval(async () => {
-            if (!bot.ready) return
-            const servers = bot.guilds
-            for (var serverID of servers.keys()) {
-                var vc = bot.voiceConnections.get(serverID)
+            if (this.loopRunning) return
+            this.loopRunning = true
+            await this.loop()
+            this.loopRunning = false
+        }, 300)
+    }
 
-                // Checks if we have songs pending OR if we are in a VC (and its ready)
-                if (await dataHelper.server.song.check(serverID) || (vc && vc?.ready)) {
-                    // console.log(serverID, "Has song(s) in line!")
-                    // console.log(bot.guilds.get(serverID).voiceStates)
-                    const songServerDB = await dataHelper.server.database.getSong(serverID)
-                    const voiceChannelID = await songServerDB.get("channel")
-                    // console.log("channel",voiceChannelID)
-                    if (!vc) vc = await bot.joinVoiceChannel(voiceChannelID)
-                    // console.log("Voice status", "Playing", vc?.playing, "Paused", vc?.paused, "Timestamp", vc?.current?.playTime)
-                    if (vc.ready) {
-                        if (!vc.playing && !vc.paused) {
-                            const song = await dataHelper.server.song.getNext(serverID)
-                            if (!song) return
-                            var songPath = path.join(songsPath, song, "audio.mp3")
-                            if (fs.existsSync(songPath)) {
-                                vc.play(songPath, { inlineVolume: true })
-                            } else {
-                                console.log("Big error, can't find file!")
+    async loop() {
+        var bot = this.bot
+        if (!bot.ready) return
+        this.counter++
+        const servers = bot.guilds
+        for (var serverID of servers.keys()) {
+            var vc = bot.voiceConnections.get(serverID)
+
+            // Checks if we have songs pending OR if we are in a VC (and its ready)
+            if (await dataHelper.server.song.check(serverID) || (vc && vc?.ready)) {
+                // console.log(serverID, "Has song(s) in line!")
+                // console.log(bot.guilds.get(serverID).voiceStates)
+                const songServerDB = await dataHelper.server.database.getSong(serverID)
+                const voiceChannelID = await songServerDB.get("channel")
+                const textChannelID = await songServerDB.get("textChannel")
+
+                const vcTextChannel = bot.guilds.get(serverID).channels.get(textChannelID)
+                // console.log("channel",voiceChannelID)
+                if (!vc) vc = await bot.joinVoiceChannel(voiceChannelID)
+                // console.log("Voice status", "Playing", vc?.playing, "Paused", vc?.paused, "Timestamp", vc?.current?.playTime)
+                if (vc.ready) {
+                    if (!vc.playing && !vc.paused) {
+                        const song = await dataHelper.server.song.getNext(serverID)
+                        if (!song) return
+                        var songPath = path.join(songsPath, song)
+                        if (fs.existsSync(songPath)) {
+                            vc.play(path.join(songPath, "audio.mp3"), { inlineVolume: true })
+                            if (textChannelID && bot.guilds.get(serverID).channels.has(textChannelID)) {
+                                var { title } = require(path.join(songPath, "data.json"))
+                                bot.createMessage(textChannelID, `Now playing ${"`"}${title}${"`"}`)
                             }
-                            
+                            if (await songServerDB.get("loop")) dataHelper.server.song.add(serverID, voiceChannelID, song)
+                        } else {
+                            console.log("Big error, can't find file!")
                         }
 
-                        // Web sync
-                        if (vc.playing || vc.paused) {
-                            this.bc.postMessage({
-                                type: "webplayerSync",
-                                song: await songServerDB.get("currentSong"),
-                                paused: vc.paused,
-                                timestamp: vc?.current?.playTime,
-                                guild: serverID,
-                                channel: vc.channelID
-                            })
-                        }
-
-                        // console.log("Playing", song, songPath, await duration(songPath) * 1009)
                     }
+
+                    // Web sync
+                    if (vc.playing || vc.paused) {
+                        this.bc.postMessage({
+                            type: "webplayerSync",
+                            song: await songServerDB.get("currentSong"),
+                            paused: vc.paused,
+                            timestamp: vc?.current?.playTime,
+                            guild: serverID,
+                            channel: vc.channelID
+                        })
+
+                        if (false && this.counter >= 50 && vcTextChannel) {
+                            this.counter = 0
+                            console.log("Topic update")
+                            var currentSong = await songServerDB.get("currentSong")
+                            var dur = await songServerDB.get("currentSongDur")
+                            var { title } = require(path.join(songsPath, currentSong, "data.json"))
+
+                            var bar = progressbar.splitBar(dur,vc.current.playTime, 20)
+
+                            // vcTextChannel.createMessage(`Playing: ${"`"}${title}${"`"}, ${bar[0]} | ${bar[0]}`)
+                            console.log("Edit go!")
+                            // vcTextChannel.edit({ topic: `Playing: ${"`"}${title}${"`"}, ${bar[0]} | ${bar[1]}` })
+                            console.log("Done")
+                        }
+                    }
+
+                    // console.log("Playing", song, songPath, await duration(songPath) * 1009)
                 }
             }
-        }, 300)
+        }
     }
 
     async download(url) {
@@ -171,18 +206,26 @@ class music {
                 return outs
             } else if (isValidUrl(url.url)) {
                 return new Promise(async (resolve, _reject) => {
-                    let videoID = yt_download.getURLVideoID(url.url)
+                    let videoInfo = await yt_download.getBasicInfo(url.url)
+                    delete videoInfo.videoDetails.storyboards
+                    delete videoInfo.videoDetails.thumbnails
+                    console.log(videoInfo.videoDetails)
+
+                    let videoID = videoInfo.videoDetails.videoId ?? yt_download.getURLVideoID(url.url)
 
                     const outputFolder = path.join(songsPath, videoID)
                     const output_video = path.join(outputFolder, "video.mp4")
                     const output_audio = path.join(outputFolder, "audio.mp3")
+                    const output_data = path.join(outputFolder, "data.json")
 
                     // check if the file exists
                     if (fs.existsSync(output_video) && fs.existsSync(output_audio)) {
+                        fs.writeFileSync(output_data, JSON.stringify(videoInfo.videoDetails))
                         console.log("Using cached file")
-                        return resolve({ file: videoID, action: "cache"})
+                        return resolve({ file: videoID, action: "cache" })
                     } else {
-                        fs.mkdirSync(outputFolder, {recursive:true})
+                        fs.mkdirSync(outputFolder, { recursive: true })
+                        fs.writeFileSync(output_data, JSON.stringify(videoInfo.videoDetails))
                         const audioStream = yt_download(url.url, { quality: "highestaudio" });
                         const videoStream = yt_download(url.url, { quality: "highestvideo" });
 
@@ -191,11 +234,11 @@ class music {
                         const videoDLData = { error: false, done: false, process: null }
                         const audioDLData = { error: false, done: false, process: null }
 
-                        var inter = setInterval(async ()=>{
-                            if (videoDLData.error && audioDLData.error) return resolve({ file: null, action: "error"})
+                        var inter = setInterval(async () => {
+                            if (videoDLData.error && audioDLData.error) return resolve({ file: null, action: "error" })
                             if (videoDLData.done && audioDLData.done) {
                                 clearInterval(inter)
-                                return resolve({ file: videoID, action: "download"})
+                                return resolve({ file: videoID, action: "download" })
                             }
                         }, 100)
 
@@ -301,6 +344,7 @@ class music {
      * @param {Eris.CommandInteraction} _interaction
      */
     async add(song, guildID, channelID, _bot, _interaction, _shutUp = false) {
+        // _interaction.createMessage("Thinking...")
         if (song.includes("open.spotify.com")) {
             var data = await this.spotify.get(song)
             console.log("Spotify Data", data)
@@ -308,13 +352,13 @@ class music {
                 for (var sName of data) {
                     await this.add(sName, guildID, channelID, _bot, _interaction, true)
                 }
-                await _interaction.createFollowup(`Added songs from ${song}`)
+                await _interaction.editOriginalMessage(`Added songs from ${song}`)
                 return
             } else song = data
         }
         // Song can be a URL or song name
         const urlData = await this.getURL(song)
-        if (!_shutUp) await _interaction.createFollowup("Got song URL!")
+        if (!_shutUp) await _interaction.editOriginalMessage("Got song URL!")
         if (song) {
             var videoInfo = await this.download(urlData)
             if (Array.isArray(videoInfo)) {
@@ -323,21 +367,26 @@ class music {
                     if (videoInfo.action == "error") continue
                     await dataHelper.server.song.add(guildID, channelID, data.file)
                 }
-                if (!_shutUp) await _interaction.createFollowup(`Added ${Object.keys(videoInfo).length} songs`)
+                if (!_shutUp) await _interaction.editOriginalMessage(`Added ${Object.keys(videoInfo).length} songs`)
                 return
             } else {
                 // console.log(song, urlData, videoInfo)
-                if (videoInfo.action == "error" && !_shutUp) return await _interaction.createFollowup("Error downloading song!")
-                if (!_shutUp) await _interaction.createFollowup(`Using ${videoInfo.action} for ${song}`)
+                if (videoInfo.action == "error" && !_shutUp) return await _interaction.editOriginalMessage("Error downloading song!")
+                if (!_shutUp) await _interaction.editOriginalMessage(`Using ${videoInfo.action} for ${song}`)
                 await dataHelper.server.song.add(guildID, channelID, videoInfo.file)
                 return
             }
         }
     }
-    async enableMode(guildID, mode, value) {
-        switch (mode){
+    async enableMode(guildID, mode, value = null) {
+        var db = await dataHelper.server.database.getSong(guildID)
+        switch (mode) {
             case 1: { // Loop mode
-                
+                if (value == null) {
+                    if (await db.has("loop")) value = !(await db.get("loop")); else value = true
+                }
+                await db.set("loop", value)
+                return value
             }
         }
     }
