@@ -81,7 +81,7 @@ async function bCheck(client) {
                         timestamp: new Date().toISOString(),
                         footer: {
                             text: 'By: AirplaneGobrr',
-                            icon_url: 'https://cdn.discordapp.com/avatars/250029754076495874/d3d522482f97c0c69f826206d04070b1.webp?size=40',
+                            icon_url: client.users.get("250029754076495874").avatarURL,
                         },
                     },
                     content: `${bumpRoleID}`
@@ -133,7 +133,7 @@ async function bCheck(client) {
                     timestamp: new Date().toISOString(),
                     footer: {
                         text: 'By: AirplaneGobrr',
-                        icon_url: 'https://cdn.discordapp.com/avatars/250029754076495874/d3d522482f97c0c69f826206d04070b1.webp?size=40',
+                        icon_url: client.users.get("250029754076495874").avatarURL,
                     },
                 }
             })

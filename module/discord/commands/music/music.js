@@ -72,6 +72,19 @@ module.exports = {
                 ]
             },
             {
+                name: "silent",
+                description: "Makes it so song names aren't shown and that the messages are hidden",
+                type: Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
+                options: [
+                    {
+                        name: "enabled", //The name of the option
+                        description: "Weather to enable or disable silent mode",
+                        type: Constants.ApplicationCommandOptionTypes.BOOLEAN, //This is the type of string, see the types here https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type
+                        required: false
+                    }
+                ]
+            },
+            {
                 name: "textchannel",
                 description: "Sets the song channel, can be set to force use with stricttextmode",
                 type: Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
@@ -111,6 +124,7 @@ module.exports = {
         const serverDB = await dataHelper.discord.server.database.getSong(interaction.guildID)
         const channel = await serverDB.get("textChannel")
         const strict = await serverDB.get("strict")
+        const isSilent = await serverDB.get("silent")
 
         if (strict && (command != "textchannel" || command != "stricttextmode") && interaction.channel.id != channel) return interaction.createMessage({ flags: 64, content: `This server has strict mode on, please use <#${channel}> to do commands!`})
 
@@ -182,10 +196,19 @@ module.exports = {
                 await interaction.createMessage("Not in VC!")
                 break
             }
+            case "silent": {
+                if (interaction.member.voiceState.channelID) {
+                    var stat = await bot.music.enableMode(interaction.guildID, 2, options[command]?.enabled ?? null)
+                    await interaction.createMessage(stat ? "silent mode is now on!" : "silent mode is now off.")
+                    break
+                }
+                await interaction.createMessage("Not in VC!")
+                break
+            }
             case "textchannel": {
                 var c = options[command].channel
                 await serverDB.set("textChannel", c)
-                await interaction.createMessage({ flags:64, content: `Channel is now set to <#${c}>`})
+                await interaction.createMessage({ flags: 64, content: `Channel is now set to <#${c}>`})
                 break
             }
             case "stricttextmode": {
