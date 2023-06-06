@@ -21,7 +21,6 @@ setInterval(() => {
     bc.postMessage({
         service: me,
         type: "update",
-        
         processData: {
             cpuUsage: process.cpuUsage(),
             memory: v8.getHeapStatistics(),

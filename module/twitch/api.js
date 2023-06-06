@@ -4,8 +4,8 @@ const { twitch: config } = require("../../config.json")
 class TwitchAPI {
     /**
      * 
-     * @param {Object} options 
-     * @param {String} options.clientID 
+     * @param {Object} options
+     * @param {String} options.clientID
      * @param {String} options.clientSecret
      * @param {String} options.scopes
      * @param {String} options.callbackURL

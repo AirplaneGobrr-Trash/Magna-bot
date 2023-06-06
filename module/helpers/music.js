@@ -356,6 +356,10 @@ class music {
                 await _interaction.editOriginalMessage(`Added songs from ${song}`)
                 return
             } else song = data
+        } else if (song.startsWith("https://youtube.com/watch/") || song.startsWith("https://youtu.be/")) {
+            const url = new URL(song)
+            song = `https://www.youtube.com/watch?v=${url.pathname.split("/").pop()}`
+            
         }
         // Song can be a URL or song name
         const urlData = await this.getURL(song)
@@ -388,6 +392,13 @@ class music {
                     if (await db.has("loop")) value = !(await db.get("loop")); else value = true
                 }
                 await db.set("loop", value)
+                return value
+            }
+            case 2: {
+                if (value == null) {
+                    if (await db.has("silent")) value = !(await db.get("silent")); else value = true
+                }
+                await db.set("silent", value)
                 return value
             }
         }
