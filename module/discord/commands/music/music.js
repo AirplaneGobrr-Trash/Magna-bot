@@ -2,6 +2,8 @@ const eris = require("eris");
 const client = require("../../../helpers/clientBuilder")
 const { discord: { optionsPraser } } = require("../../../helpers/utils");
 const dataHelper = require("../../../helpers/dataHelper");
+const path = require("path")
+const progressbar = require('string-progressbar');
 
 const Constants = eris.Constants;
 
@@ -110,6 +112,11 @@ module.exports = {
                     }
                 ]
             },
+            {
+                name: "timeleft",
+                description: "Says who much time is left for the current song",
+                type: Constants.ApplicationCommandOptionTypes.SUB_COMMAND
+            }
         ]
     },
 
@@ -216,6 +223,16 @@ module.exports = {
                 await serverDB.set("strict", e)
                 await interaction.createMessage({ flags:64, content: `Strict mode is now ${e ? "on" : "off"}.`})
                 break
+            }
+            case "timeleft": {
+                var currentSong = await serverDB.get("currentSong")
+                var dur = await serverDB.get("currentSongDur")
+                var { title } = require(path.join(dataHelper.mainDataPath, "songs", currentSong, "data.json"))
+                var vc = bot.voiceConnections.get(interaction.guildID)
+
+                var bar = progressbar.splitBar(dur,vc.current.playTime, 20)
+
+                interaction.createMessage(`Playing: ${"`"}${title}${"`"}, ${bar[0]} | ${bar[1]}`)
             }
         }
     }
