@@ -114,8 +114,21 @@ module.exports = {
             },
             {
                 name: "timeleft",
-                description: "Says who much time is left for the current song",
+                description: "Says how much time is left for the current song",
                 type: Constants.ApplicationCommandOptionTypes.SUB_COMMAND
+            },
+            {
+                name: "autoleave",
+                description: "Should the bot leave if no members are in vc?",
+                type: Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
+                options: [
+                    {
+                        name: "enabled", //The name of the option
+                        description: "Weather to enable or disable auto leave mode.",
+                        type: Constants.ApplicationCommandOptionTypes.BOOLEAN, //This is the type of string, see the types here https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type
+                        required: true
+                    }
+                ]
             }
         ]
     },
@@ -133,7 +146,9 @@ module.exports = {
         const strict = await serverDB.get("strict")
         const isSilent = await serverDB.get("silent")
 
-        if (strict && (command != "textchannel" || command != "stricttextmode") && interaction.channel.id != channel) return interaction.createMessage({ flags: 64, content: `This server has strict mode on, please use <#${channel}> to do commands!`})
+        var nonStrictCommands = ["textchannel", "stricttextmode"]
+
+        if (strict && (!nonStrictCommands.includes(command)) && interaction.channel.id != channel) return interaction.createMessage({ flags: 64, content: `This server has strict mode on, please use <#${channel}> to do commands!`})
 
         // console.log("CommandOptions", command, options)
         switch (command) {
@@ -204,12 +219,13 @@ module.exports = {
                 break
             }
             case "silent": {
-                if (interaction.member.voiceState.channelID) {
-                    var stat = await bot.music.enableMode(interaction.guildID, 2, options[command]?.enabled ?? null)
-                    await interaction.createMessage(stat ? "silent mode is now on!" : "silent mode is now off.")
-                    break
-                }
-                await interaction.createMessage("Not in VC!")
+                var stat = await bot.music.enableMode(interaction.guildID, 2, options[command]?.enabled ?? null)
+                await interaction.createMessage(stat ? "silent mode is now on!" : "silent mode is now off.")
+                break
+            }
+            case "autoleave": {
+                var stat = await bot.music.enableMode(interaction.guildID, 3, options[command]?.enabled ?? null)
+                await interaction.createMessage(stat ? "auto leave mode is now on!" : "auto leave mode is now off.")
                 break
             }
             case "textchannel": {
@@ -232,7 +248,7 @@ module.exports = {
 
                 var bar = progressbar.splitBar(dur,vc.current.playTime, 20)
 
-                interaction.createMessage(`Playing: ${"`"}${title}${"`"}, ${bar[0]} | ${bar[1]}`)
+                await interaction.createMessage(`Playing: ${"`"}${title}${"`"}, ${bar[0]} | ${bar[1]} (${vc.current.playTime} out of ${dur})`)
             }
         }
     }

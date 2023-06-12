@@ -138,10 +138,12 @@ class music {
                 const songServerDB = await dataHelper.server.database.getSong(serverID)
                 const voiceChannelID = await songServerDB.get("channel")
                 const textChannelID = await songServerDB.get("textChannel")
+                const autoLeave = await songServerDB.get("autoLeave")
 
                 const vcTextChannel = bot.guilds.get(serverID).channels.get(textChannelID)
                 // console.log("channel",voiceChannelID)
                 if (!vc) vc = await bot.joinVoiceChannel(voiceChannelID)
+                const voiceChannel = bot.getChannel(vc.channelID)
                 // console.log("Voice status", "Playing", vc?.playing, "Paused", vc?.paused, "Timestamp", vc?.current?.playTime)
                 if (vc.ready) {
                     if (!vc.playing && !vc.paused) {
@@ -189,6 +191,13 @@ class music {
                     }
 
                     // console.log("Playing", song, songPath, await duration(songPath) * 1009)
+
+                    if (autoLeave && voiceChannel.voiceMembers.size == 1 && voiceChannel.voiceMembers.get(bot.user.id)) {
+                        // the only person in vc is the bot
+                        await vc.disconnect()
+                        await bot.createMessage(textChannelID, `Leaving VC as no one is here! :sob:`)
+                    }
+                    
                 }
             }
         }
@@ -399,6 +408,13 @@ class music {
                     if (await db.has("silent")) value = !(await db.get("silent")); else value = true
                 }
                 await db.set("silent", value)
+                return value
+            }
+            case 3: {
+                if (value == null) {
+                    if (await db.has("autoLeave")) value = !(await db.get("autoLeave")); else value = true
+                }
+                await db.set("autoLeave", value)
                 return value
             }
         }
