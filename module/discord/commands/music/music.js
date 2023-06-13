@@ -146,7 +146,7 @@ module.exports = {
         const strict = await serverDB.get("strict")
         const isSilent = await serverDB.get("silent")
 
-        var nonStrictCommands = ["textchannel", "stricttextmode"]
+        let nonStrictCommands = ["textchannel", "stricttextmode"]
 
         if (strict && (!nonStrictCommands.includes(command)) && interaction.channel.id != channel) return interaction.createMessage({ flags: 64, content: `This server has strict mode on, please use <#${channel}> to do commands!`})
 
@@ -211,7 +211,7 @@ module.exports = {
             }
             case "loop": {
                 if (interaction.member.voiceState.channelID) {
-                    var stat = await bot.music.enableMode(interaction.guildID, 1, options[command]?.enabled ?? null)
+                    let stat = await bot.music.enableMode(interaction.guildID, 1, options[command]?.enabled ?? null)
                     await interaction.createMessage(stat ? "Loop mode is now on!" : "Loop mode is now off.")
                     break
                 }
@@ -219,34 +219,34 @@ module.exports = {
                 break
             }
             case "silent": {
-                var stat = await bot.music.enableMode(interaction.guildID, 2, options[command]?.enabled ?? null)
+                let stat = await bot.music.enableMode(interaction.guildID, 2, options[command]?.enabled ?? null)
                 await interaction.createMessage(stat ? "silent mode is now on!" : "silent mode is now off.")
                 break
             }
             case "autoleave": {
-                var stat = await bot.music.enableMode(interaction.guildID, 3, options[command]?.enabled ?? null)
+                let stat = await bot.music.enableMode(interaction.guildID, 3, options[command]?.enabled ?? null)
                 await interaction.createMessage(stat ? "auto leave mode is now on!" : "auto leave mode is now off.")
                 break
             }
             case "textchannel": {
-                var c = options[command].channel
+                let c = options[command].channel
                 await serverDB.set("textChannel", c)
                 await interaction.createMessage({ flags: 64, content: `Channel is now set to <#${c}>`})
                 break
             }
             case "stricttextmode": {
-                var e = options[command].enabled
+                let e = options[command].enabled
                 await serverDB.set("strict", e)
                 await interaction.createMessage({ flags:64, content: `Strict mode is now ${e ? "on" : "off"}.`})
                 break
             }
             case "timeleft": {
-                var currentSong = await serverDB.get("currentSong")
-                var dur = await serverDB.get("currentSongDur")
-                var { title } = require(path.join(dataHelper.mainDataPath, "songs", currentSong, "data.json"))
-                var vc = bot.voiceConnections.get(interaction.guildID)
+                let currentSong = await serverDB.get("currentSong")
+                let dur = await serverDB.get("currentSongDur")
+                let { title } = require(path.join(dataHelper.mainDataPath, "songs", currentSong, "data.json"))
+                let vc = bot.voiceConnections.get(interaction.guildID)
 
-                var bar = progressbar.splitBar(dur,vc.current.playTime, 20)
+                let bar = progressbar.splitBar(dur,vc.current.playTime, 20)
 
                 await interaction.createMessage(`Playing: ${"`"}${title}${"`"}, ${bar[0]} | ${bar[1]} (${vc.current.playTime} out of ${dur})`)
             }
