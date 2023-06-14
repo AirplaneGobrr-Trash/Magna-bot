@@ -168,8 +168,17 @@ async function optionsPraser(interactionData){
     return options
 }
 
+async function sleep(ms){
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve()
+        }, ms);
+    })
+}
+
 module.exports = {
     generateUUID,
+    sleep,
     bump: {
         add: bAdd,
         check: bCheck
