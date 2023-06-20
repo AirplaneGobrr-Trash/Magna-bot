@@ -28,6 +28,7 @@ This is Magna bot!
   - [ ] Sneek (Might not be possible) (We would have to skip to the pos while loading the file, so we would have to "reopen" the connection)
   - [x] Spotify Support
   - [x] YouTube Playlist Support
+  - [ ] [SoundCloud](https://www.npmjs.com/package/soundcloud-downloader) Support 
 - [ ] Ecom (VL)
   - [ ] Global Ecom
   - [ ] Server Ecom
