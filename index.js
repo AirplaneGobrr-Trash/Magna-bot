@@ -4,14 +4,11 @@ const path = require("path");
 const fs = require("fs");
 
 let modulePath = path.join(__dirname, "module");
-let discordWorker = new Worker(path.join(modulePath, "discord"));
-// let twitchWorker = new Worker(path.join(modulePath, "twitch"));
-let webWorker = new Worker(path.join(modulePath, "web"));
 
 const workers = {
-    discord: discordWorker,
-    web: webWorker,
-    // twitch: twitchWorker
+    discord: new Worker(path.join(modulePath, "discord")),
+    web: new Worker(path.join(modulePath, "web")),
+    // twitch: new Worker(path.join(modulePath, "twitch"))
 };
 
 process.on("uncaughtException", (err) => {
