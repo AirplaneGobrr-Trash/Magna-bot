@@ -42,11 +42,11 @@ const discord_server = {
         async getNext(serverID) {
             const serverDB = await discord_server.database.getSong(serverID)
             const songs = await serverDB.get("songs")
-            var song = songs.shift()
+            const song = songs.shift()
             if (!song) return null
             await serverDB.set("songs", songs)
             await serverDB.set("currentSong", song)
-            await serverDB.set("currentSongDur", await duration(path.join(mainDataPath, "songs", song, "audio.mp3")) * 1009)
+            if (!song.startsWith("rg/")) await serverDB.set("currentSongDur", await duration(path.join(mainDataPath, "songs", song, "audio.mp3")) * 1009); else await serverDB.set("currentSongDur", null)
             return song
         },
         async getQueue(serverID) {

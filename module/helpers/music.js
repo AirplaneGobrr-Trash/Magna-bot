@@ -148,13 +148,25 @@ class music {
                 if (vc.ready) {
                     if (!vc.playing && !vc.paused) {
                         const song = await dataHelper.server.song.getNext(serverID)
-                        if (!song) return
+                        if (!song) {
+                            if (autoLeave && voiceChannel.voiceMembers.size == 1 && voiceChannel.voiceMembers.get(bot.user.id)) {
+                                // the only person in vc is the bot
+                                vc.disconnect()
+                                await bot.createMessage(textChannelID, `Leaving VC as no one is here! :sob:`)
+                            }
+                            return
+                        }
                         var songPath = path.join(songsPath, song)
+                        // if (song.startsWith("rg/"))
                         if (fs.existsSync(songPath)) {
                             vc.play(path.join(songPath, "audio.mp3"), { inlineVolume: true })
                             if (textChannelID && bot.guilds.get(serverID).channels.has(textChannelID)) {
-                                var { title } = require(path.join(songPath, "data.json"))
-                                bot.createMessage(textChannelID, `Now playing ${"`"}${title}${"`"}`)
+                                if (song.startsWith("rg/")) {
+                                    // Radio garden
+                                } else {
+                                    var { title } = require(path.join(songPath, "data.json"))
+                                    bot.createMessage(textChannelID, `Now playing ${"`"}${title}${"`"}`)
+                                }
                             }
                             if (await songServerDB.get("loop")) dataHelper.server.song.add(serverID, voiceChannelID, song)
                         } else {
@@ -191,13 +203,6 @@ class music {
                     }
 
                     // console.log("Playing", song, songPath, await duration(songPath) * 1009)
-
-                    if (autoLeave && voiceChannel.voiceMembers.size == 1 && voiceChannel.voiceMembers.get(bot.user.id)) {
-                        // the only person in vc is the bot
-                        await vc.disconnect()
-                        await bot.createMessage(textChannelID, `Leaving VC as no one is here! :sob:`)
-                    }
-                    
                 }
             }
         }
