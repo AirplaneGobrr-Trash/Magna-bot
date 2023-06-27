@@ -1,6 +1,7 @@
 const eris = require("eris");
 const client = require("../../../helpers/clientBuilder")
 const { discord: { optionsPraser } } = require("../../../helpers/utils");
+const dataHelper = require("../../../helpers/dataHelper");
 
 const Constants = eris.Constants;
 
@@ -46,5 +47,20 @@ module.exports = {
     async execute(interaction, bot) {
         const options = await optionsPraser(interaction.data.options)
         const command = Object.keys(options)[0]
+        const serverDB = await dataHelper.discord.server.database.getSong(interaction.guildID)
+        
+        console.log(command, options)
+
+        switch(command){
+            case "play": {
+                // thegoosh-radio-deep-house/WiT8Tr9E
+                var url = options[command].url
+                url = url.split("/")
+                var songID = url.pop()
+                var songName = url.pop()
+                await dataHelper.discord.server.song.add(interaction.guildID, interaction.channel.id, `rg/${songID}`)
+                await interaction.createMessage(`Playing ${songName}`)
+            }
+        }
     }
 }

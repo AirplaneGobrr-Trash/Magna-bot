@@ -113,8 +113,7 @@ class music {
         renewSpotify()
         setInterval(() => {
             renewSpotify()
-        }, 120 * 1000)
-
+        }, 5 * 60 * 1000)
         setInterval(async () => {
             if (this.loopRunning) return
             this.loopRunning = true
@@ -124,53 +123,64 @@ class music {
     }
 
     async loop() {
-        var bot = this.bot
-        if (!bot.ready) return
-        this.counter++
-        const servers = bot.guilds
-        for (var serverID of servers.keys()) {
-            var vc = bot.voiceConnections.get(serverID)
+        try {
+            var bot = this.bot
+            if (!bot.ready) return
+            this.counter++
+            const servers = bot.guilds
+            for (var serverID of servers.keys()) {
+                var vc = bot.voiceConnections.get(serverID)
 
-            // Checks if we have songs pending OR if we are in a VC (and its ready)
-            if (await dataHelper.server.song.check(serverID) || (vc && vc?.ready)) {
-                // console.log(serverID, "Has song(s) in line!")
-                // console.log(bot.guilds.get(serverID).voiceStates)
-                const songServerDB = await dataHelper.server.database.getSong(serverID)
-                const voiceChannelID = await songServerDB.get("channel")
-                const textChannelID = await songServerDB.get("textChannel")
-                const autoLeave = await songServerDB.get("autoLeave")
+                // Checks if we have songs pending OR if we are in a VC (and its ready)
+                if (await dataHelper.server.song.check(serverID) || (vc && vc?.ready)) {
+                    console.log(bot.voiceConnections)
+                    // console.log(serverID, "Has song(s) in line!")
+                    // console.log(bot.guilds.get(serverID).voiceStates)
+                    const songServerDB = await dataHelper.server.database.getSong(serverID)
+                    const voiceChannelID = await songServerDB.get("channel")
+                    const textChannelID = await songServerDB.get("textChannel")
+                    const autoLeave = await songServerDB.get("autoLeave")
 
-                const vcTextChannel = bot.guilds.get(serverID).channels.get(textChannelID)
-                // console.log("channel",voiceChannelID)
-                if (!vc) vc = await bot.joinVoiceChannel(voiceChannelID)
-                const voiceChannel = bot.getChannel(vc.channelID)
-                // console.log("Voice status", "Playing", vc?.playing, "Paused", vc?.paused, "Timestamp", vc?.current?.playTime)
-                if (vc.ready) {
-                    if (!vc.playing && !vc.paused) {
-                        const song = await dataHelper.server.song.getNext(serverID)
-                        if (!song) {
-                            if (autoLeave && voiceChannel.voiceMembers.size == 1 && voiceChannel.voiceMembers.get(bot.user.id)) {
-                                // the only person in vc is the bot
-                                vc.disconnect()
-                                await bot.createMessage(textChannelID, `Leaving VC as no one is here! :sob:`)
+                    const vcTextChannel = bot.guilds.get(serverID).channels.get(textChannelID)
+                    console.log("channel",voiceChannelID)
+                    if (!vc) {
+                        console.log("Need to join VC!", vc)
+                        vc = await bot.joinVoiceChannel(voiceChannelID.toString())
+                        console.log("Joinned VC!")
+                    }
+                    const voiceChannel = bot.getChannel(vc.channelID)
+                    // console.log("Voice status", "Playing", vc?.playing, "Paused", vc?.paused, "Timestamp", vc?.current?.playTime)
+                    if (vc.ready) {
+                        if (!vc.playing && !vc.paused) {
+                            const song = await dataHelper.server.song.getNext(serverID)
+                            if (!song) {
+                                if (autoLeave && voiceChannel.voiceMembers.size == 1 && voiceChannel.voiceMembers.get(bot.user.id)) {
+                                    // the only person in vc is the bot
+                                    vc.disconnect()
+                                    await bot.createMessage(textChannelID, `Leaving VC as no one is here! :sob:`)
+                                }
+                                return
                             }
-                            return
-                        }
-                        var songPath = path.join(songsPath, song)
-                        // if (song.startsWith("rg/"))
-                        if (fs.existsSync(songPath)) {
-                            vc.play(path.join(songPath, "audio.mp3"), { inlineVolume: true })
+                            var songPath = path.join(songsPath, song)
+                            // if (song.startsWith("rg/"))
                             if (textChannelID && bot.guilds.get(serverID).channels.has(textChannelID)) {
                                 if (song.startsWith("rg/")) {
                                     // Radio garden
-                                } else {
+                                    var so = song.split("/").pop()
+                                    vc.play(`http://radio.garden/api/ara/content/listen/${so}/channel.mp3`)
+                                    console.log(`http://radio.garden/api/ara/content/listen/${so}/channel.mp3`)
+                                    await bot.createMessage(textChannelID, `Now playing ${"`"}${so}${"`"}`)
+                                } else if (fs.existsSync(songPath)) {
+                                    vc.play(path.join(songPath, "audio.mp3"), { inlineVolume: true })
+
                                     var { title } = require(path.join(songPath, "data.json"))
-                                    bot.createMessage(textChannelID, `Now playing ${"`"}${title}${"`"}`)
+                                    await bot.createMessage(textChannelID, `Now playing ${"`"}${title}${"`"}`)
+                                } else {
+                                    console.log("Can't find file!")
+                                    await bot.createMessage(textChannelID, `Can't find song file`)
                                 }
                             }
                             if (await songServerDB.get("loop")) dataHelper.server.song.add(serverID, voiceChannelID, song)
-                        } else {
-                            console.log("Big error, can't find file!")
                         }
 
                     }
@@ -193,7 +203,7 @@ class music {
                             var dur = await songServerDB.get("currentSongDur")
                             var { title } = require(path.join(songsPath, currentSong, "data.json"))
 
-                            var bar = progressbar.splitBar(dur,vc.current.playTime, 20)
+                            var bar = progressbar.splitBar(dur, vc.current.playTime, 20)
 
                             // vcTextChannel.createMessage(`Playing: ${"`"}${title}${"`"}, ${bar[0]} | ${bar[0]}`)
                             console.log("Edit go!")
@@ -205,8 +215,13 @@ class music {
                     // console.log("Playing", song, songPath, await duration(songPath) * 1009)
                 }
             }
+        } catch (e) {
+            console.log("ERROR", e)
+            return null
         }
+        return null
     }
+
 
     async download(url) {
         if (url) {
@@ -214,7 +229,7 @@ class music {
             if (Array.isArray(url)) {
                 var outs = []
                 for (var i of url) {
-                    var d = await this.download({url: i.url})
+                    var d = await this.download({ url: i.url })
                     console.log(d)
                     outs.push(d)
                 }
@@ -373,7 +388,7 @@ class music {
         } else if (song.startsWith("https://youtube.com/watch/") || song.startsWith("https://youtu.be/")) {
             const url = new URL(song)
             song = `https://www.youtube.com/watch?v=${url.pathname.split("/").pop()}`
-            
+
         }
         // Song can be a URL or song name
         const urlData = await this.getURL(song)
