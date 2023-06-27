@@ -191,6 +191,7 @@ module.exports = {
                 break
             }
             case "play": {
+                console.log("VOICE CHANNEL", interaction.member.voiceState.channelID)
                 if (interaction.member.voiceState.channelID) {
                     await interaction.createMessage("Looking up `" + options[command].song + "`")
                     await bot.music.add(options[command].song, interaction.guildID, interaction.member.voiceState.channelID, bot, interaction)

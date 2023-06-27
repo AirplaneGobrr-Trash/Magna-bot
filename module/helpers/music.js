@@ -1,3 +1,4 @@
+const axios = require('axios').default;
 const SpotifyWebApi = require('spotify-web-api-node');
 const progressbar = require('string-progressbar');
 const yt_download = require("ytdl-core")
@@ -133,7 +134,7 @@ class music {
 
                 // Checks if we have songs pending OR if we are in a VC (and its ready)
                 if (await dataHelper.server.song.check(serverID) || (vc && vc?.ready)) {
-                    console.log(bot.voiceConnections)
+                    // console.log(bot.voiceConnections)
                     // console.log(serverID, "Has song(s) in line!")
                     // console.log(bot.guilds.get(serverID).voiceStates)
                     const songServerDB = await dataHelper.server.database.getSong(serverID)
@@ -142,7 +143,7 @@ class music {
                     const autoLeave = await songServerDB.get("autoLeave")
 
                     const vcTextChannel = bot.guilds.get(serverID).channels.get(textChannelID)
-                    console.log("channel",voiceChannelID)
+                    // console.log("channel",voiceChannelID)
                     if (!vc) {
                         console.log("Need to join VC!", vc)
                         vc = await bot.joinVoiceChannel(voiceChannelID.toString())
@@ -167,9 +168,26 @@ class music {
                                 if (song.startsWith("rg/")) {
                                     // Radio garden
                                     var so = song.split("/").pop()
-                                    vc.play(`http://radio.garden/api/ara/content/listen/${so}/channel.mp3`)
-                                    console.log(`http://radio.garden/api/ara/content/listen/${so}/channel.mp3`)
-                                    await bot.createMessage(textChannelID, `Now playing ${"`"}${so}${"`"}`)
+                                    const controller = new AbortController();
+                                    axios.get(`http://radio.garden/api/ara/content/listen/${so}/channel.mp3`, {
+                                        timeout: 2000,
+                                        signal: controller.signal,
+                                        validateStatus: () => true,
+                                    }).then(async (response) => {
+                                        
+                                    }).catch(async (error) => {
+                                        console.log(error.config, error.code)
+                                        if (error?.code == "ERR_CANCELED") {
+                                            console.log(error.request._currentUrl)
+                                            vc.play(error.request._currentUrl)
+                                            await bot.createMessage(textChannelID, `Now playing ${"`"}${so}${"`"}`)
+                                        }
+                                    })
+
+                                    setTimeout(() => {
+                                        controller.abort()
+                                    }, 5*1000);
+                                    
                                 } else if (fs.existsSync(songPath)) {
                                     vc.play(path.join(songPath, "audio.mp3"), { inlineVolume: true })
 
@@ -374,7 +392,6 @@ class music {
      * @param {Eris.CommandInteraction} _interaction
      */
     async add(song, guildID, channelID, _bot, _interaction, _shutUp = false) {
-        // _interaction.createMessage("Thinking...")
         if (song.includes("open.spotify.com")) {
             var data = await this.spotify.get(song)
             console.log("Spotify Data", data)

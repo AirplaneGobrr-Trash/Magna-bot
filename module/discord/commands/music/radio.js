@@ -58,7 +58,7 @@ module.exports = {
                 url = url.split("/")
                 var songID = url.pop()
                 var songName = url.pop()
-                await dataHelper.discord.server.song.add(interaction.guildID, interaction.channel.id, `rg/${songID}`)
+                await dataHelper.discord.server.song.add(interaction.guildID, interaction.member.voiceState.channelID, `rg/${songID}`)
                 await interaction.createMessage(`Playing ${songName}`)
             }
         }

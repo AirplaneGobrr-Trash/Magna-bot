@@ -110,3 +110,4 @@ database.json
 old
 data/*
 config.json
+pnpm-lock.yaml
