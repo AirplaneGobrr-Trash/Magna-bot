@@ -179,7 +179,9 @@ class music {
                                         console.log(error.config, error.code)
                                         if (error?.code == "ERR_CANCELED") {
                                             console.log(error.request._currentUrl)
-                                            vc.play(error.request._currentUrl)
+                                            vc.play(error.request._currentUrl, {
+                                                voiceDataTimeout: -1
+                                            })
                                             await bot.createMessage(textChannelID, `Now playing ${"`"}${so}${"`"}`)
                                         }
                                     })
