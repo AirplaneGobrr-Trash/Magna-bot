@@ -182,7 +182,7 @@ module.exports = {
             case "volume": {
                 let vc = bot.voiceConnections.get(interaction.guildID)
                 if (vc) {
-                    vc.setVolume(options[command].volume)
+                    vc.setVolume(options[command].volume / 100)
                     await interaction.createMessage("Set volume to " + options[command].volume)
                     break
                 }
