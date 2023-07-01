@@ -182,7 +182,7 @@ module.exports = {
             case "volume": {
                 let vc = bot.voiceConnections.get(interaction.guildID)
                 if (vc) {
-                    vc.setVolume(options[command].volume)
+                    vc.setVolume(options[command].volume / 100)
                     await interaction.createMessage("Set volume to " + options[command].volume)
                     break
                 }
@@ -191,6 +191,7 @@ module.exports = {
                 break
             }
             case "play": {
+                console.log("VOICE CHANNEL", interaction.member.voiceState.channelID)
                 if (interaction.member.voiceState.channelID) {
                     await interaction.createMessage("Looking up `" + options[command].song + "`")
                     await bot.music.add(options[command].song, interaction.guildID, interaction.member.voiceState.channelID, bot, interaction)
