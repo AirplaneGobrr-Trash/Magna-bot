@@ -150,6 +150,11 @@ module.exports = {
 
         if (strict && (!nonStrictCommands.includes(command)) && interaction.channel.id != channel) return interaction.createMessage({ flags: 64, content: `This server has strict mode on, please use <#${channel}> to do commands!`})
 
+        if (!channel){
+            await serverDB.set("textChannel", interaction.channel.id)
+            console.log("Auto set text channel")
+        }
+
         // console.log("CommandOptions", command, options)
         switch (command) {
             case "queue": {

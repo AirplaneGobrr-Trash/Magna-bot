@@ -164,43 +164,47 @@ class music {
                             }
                             var songPath = path.join(songsPath, song)
                             // if (song.startsWith("rg/"))
-                            if (textChannelID && bot.guilds.get(serverID).channels.has(textChannelID)) {
-                                if (song.startsWith("rg/")) {
-                                    // Radio garden
-                                    var so = song.split("/").pop()
-                                    const controller = new AbortController();
-                                    axios.get(`http://radio.garden/api/ara/content/listen/${so}/channel.mp3`, {
-                                        timeout: 2000,
-                                        signal: controller.signal,
-                                        validateStatus: () => true,
-                                    }).then(async (response) => {
-                                        
-                                    }).catch(async (error) => {
-                                        console.log(error.config, error.code)
-                                        if (error?.code == "ERR_CANCELED") {
-                                            console.log(error.request._currentUrl)
-                                            vc.play(error.request._currentUrl, {
-                                                voiceDataTimeout: -1,
-                                                inlineVolume: true
-                                            })
-                                            await bot.createMessage(textChannelID, `Now playing ${"`"}${so}${"`"}`)
-                                        }
-                                    })
 
-                                    setTimeout(() => {
-                                        controller.abort()
-                                    }, 5*1000);
-                                    
-                                } else if (fs.existsSync(songPath)) {
-                                    vc.play(path.join(songPath, "audio.mp3"), { inlineVolume: true })
+                            if (song.startsWith("rg/")) {
+                                // Radio garden
+                                var so = song.split("/").pop()
+                                console.log("Radio garden", so)
+                                const controller = new AbortController();
+                                axios.get(`http://radio.garden/api/ara/content/listen/${so}/channel.mp3`, {
+                                    timeout: 2000,
+                                    signal: controller.signal,
+                                    validateStatus: () => true,
+                                }).then(async (response) => {
 
-                                    var { title } = require(path.join(songPath, "data.json"))
-                                    await bot.createMessage(textChannelID, `Now playing ${"`"}${title}${"`"}`)
-                                } else {
-                                    console.log("Can't find file!")
-                                    await bot.createMessage(textChannelID, `Can't find song file`)
-                                }
+                                }).catch(async (error) => {
+                                    console.log(error.config, error.code)
+                                    if (error?.code == "ERR_CANCELED") {
+                                        console.log(error.request._currentUrl)
+                                        vc.play(error.request._currentUrl, {
+                                            voiceDataTimeout: -1,
+                                            inlineVolume: true
+                                        })
+                                        await bot.createMessage(textChannelID, `Now playing ${"`"}${so}${"`"}`)
+                                    } else {
+                                        console.log(error)
+                                    }
+                                })
+
+                                setTimeout(() => {
+                                    controller.abort()
+                                }, 5 * 1000);
+
+                            } else if (fs.existsSync(songPath)) {
+                                console.log("Starting to play", songPath, song)
+                                vc.play(path.join(songPath, "audio.mp3"), { inlineVolume: true })
+
+                                var { title } = require(path.join(songPath, "data.json"))
+                                await bot.createMessage(textChannelID, `Now playing ${"`"}${title}${"`"}`)
+                            } else {
+                                console.log("Can't find file!")
+                                await bot.createMessage(textChannelID, `Can't find song file`)
                             }
+
                             if (await songServerDB.get("loop")) dataHelper.server.song.add(serverID, voiceChannelID, song)
                         }
 
