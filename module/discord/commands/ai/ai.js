@@ -73,7 +73,7 @@ module.exports = {
         if (data.status == 3) {
             var files = []
             for (let index = 0; index < imageCount; index++) {
-                const response = await axios.get(`http://localhost:3504/image/${jobID}/${index}`, {responseType: "arraybuffer"})
+                const response = await axios.get(`http://192.168.4.50:3504/image/${jobID}/${index}`, {responseType: "arraybuffer"})
                 // console.log(response.data)
                 let img = Buffer.from(response.data, "binary")
                 files.push({ file: img, name: `${index}.ai.airplanegobrr.xyz.png`})
