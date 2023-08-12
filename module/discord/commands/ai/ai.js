@@ -31,8 +31,8 @@ module.exports = {
                         required: true,
                         choices: [
                             {
-                                name: "andite/anything-v4.0",
-                                value: "andite/anything-v4.0"
+                                name: "xyn-ai/anything-v4.0",
+                                value: "xyn-ai/anything-v4.0"
                             },
                             {
                                 name: "gsdf/Counterfeit-V2.5",
