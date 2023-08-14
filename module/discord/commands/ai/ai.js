@@ -8,7 +8,21 @@ const Constants = eris.Constants;
 
 module.exports = {
     alwaysUpdate: true,
-    command: {
+    command: async () => {
+        var response = await axios.get("http://192.168.4.50:3504/api/models")
+        var models = {}
+        var data = {"TextToImageModels":["xyn-ai/anything-v4.0","gsdf/Counterfeit-V2.5","gsdf/Replicant","katakana/2D-Mix","prompthero/openjourney","runwayml/stable-diffusion-v1-5","hakurei/waifu-diffusion","johnslegers/epic-diffusion","stabilityai/stable-diffusion-2-1","22h/vintedois-diffusion-v0-1","Kilgori/inisanium-model"]}
+
+        for (var modelType in data){
+            models[modelType] = []
+            for (var model of data[modelType]) {
+                models[modelType].push({
+                    name: model,
+                    value: model
+                })
+            }
+        }
+    return {
         name: "ai",
         description: "AI stuff",
         // type: Constants.ApplicationCommandTypes.CHAT_INPUT,
@@ -29,16 +43,7 @@ module.exports = {
                         description: "model to use",
                         type: Constants.ApplicationCommandOptionTypes.STRING, //This is the type of string, see the types here https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type
                         required: true,
-                        choices: [
-                            {
-                                name: "xyn-ai/anything-v4.0",
-                                value: "xyn-ai/anything-v4.0"
-                            },
-                            {
-                                name: "gsdf/Counterfeit-V2.5",
-                                value: "gsdf/Counterfeit-V2.5"
-                            }
-                        ]
+                        choices: models["TextToImageModels"]
                     },
                     {
                         name: "steps", //The name of the option
@@ -61,7 +66,8 @@ module.exports = {
                 ]
             },
         ]
-    },
+    }
+},
 
     async loop(interaction, jobID, imageCount){
         const statusResponse = await axios.post("http://192.168.4.50:3504/api/status", {
