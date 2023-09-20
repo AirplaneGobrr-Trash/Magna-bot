@@ -29,6 +29,11 @@ const discord_server = {
             const filePath = path.join(discord_serverDataPath, serverID, "songs.json")
             fs.mkdirSync(path.join(discord_serverDataPath, serverID), {recursive: true})
             return new dbBuilder({ filename: filePath })
+        },
+        async getExtra(serverID) {
+            const filePath = path.join(discord_serverDataPath, serverID, "extra.json")
+            fs.mkdirSync(path.join(discord_serverDataPath, serverID), {recursive: true})
+            return new dbBuilder({ filename: filePath })
         }
     },
     song: {

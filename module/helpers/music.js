@@ -133,7 +133,7 @@ class music {
                 var vc = bot.voiceConnections.get(serverID)
 
                 // Checks if we have songs pending OR if we are in a VC (and its ready)
-                if (await dataHelper.server.song.check(serverID) || (vc && vc?.ready)) {
+                if (await dataHelper.server.song.check(serverID) || vc?.ready) {
                     // console.log(bot.voiceConnections)
                     // console.log(serverID, "Has song(s) in line!")
                     // console.log(bot.guilds.get(serverID).voiceStates)

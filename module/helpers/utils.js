@@ -1,6 +1,6 @@
 const { discord: dataHelper } = require("./dataHelper")
 const client = require("./clientBuilder")
-const { Constants } = require("eris")
+const eris = require("eris")
 const path = require("path")
 const fs = require("fs")
 
@@ -153,11 +153,11 @@ async function optionsPraser(interactionData){
     // console.log("run",interactionData)
     for (var option of interactionData) {
         // options[opt.name] = opt.value ?? opt
-        if (option.type === Constants.ApplicationCommandOptionTypes.SUB_COMMAND_GROUP) {
+        if (option.type === eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND_GROUP) {
             // console.log("subGroup", __bName, option.name, option.options)
             options[option.name] = await optionsPraser(option.options)
 
-        } else if (option.type === Constants.ApplicationCommandOptionTypes.SUB_COMMAND) {
+        } else if (option.type === eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND) {
             // console.log("sub command", __bName, option.name, option.options)
             options[option.name] = await optionsPraser(option.options)
 
@@ -176,6 +176,40 @@ async function sleep(ms){
     })
 }
 
+/**
+ * 
+ * @param {eris.Member} member
+ * @param {eris.VoiceChannel} channel
+ * @param {eris.Client} bot
+ */
+async function checkIfBitrateChange(member, channel, bot) {
+    const nonBots = channel?.voiceMembers?.filter(mem => mem.bot == false).length
+    const totalCount = channel?.voiceMembers.filter(mem => true).length
+    const db = await dataHelper.server.database.getExtra(channel.guild.id)
+
+    if (!await db.has("autoBitrate")) return
+
+    const botCheck = await db.get("autoBitrate.botsCount")
+    const isEnabled = await db.get("autoBitrate.enabled")
+    const defaultBitrate = await db.get("autoBitrate.bitrate") ?? 64
+
+    if (isEnabled && ((botCheck && totalCount < 2) || (nonBots < 2))) {
+        console.log("Don't need bitrate!")
+        await channel.edit({
+            bitrate: 8 * 1000
+        })
+
+    } else if (isEnabled) {
+        console.log("Need bitrate!")
+        await channel.edit({
+            bitrate: defaultBitrate * 1000
+        })
+    }
+    // channel.edit({
+    //     bitrate: 0
+    // })
+}
+
 module.exports = {
     generateUUID,
     sleep,
@@ -184,6 +218,7 @@ module.exports = {
         check: bCheck
     },
     discord: {
-        optionsPraser
+        optionsPraser,
+        checkIfBitrateChange
     }
 }

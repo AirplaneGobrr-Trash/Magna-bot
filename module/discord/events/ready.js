@@ -14,6 +14,8 @@ module.exports = {
      */
     async execute(bot) {
         // console.log(bot)
+        // bot.on("voiceChannelJoin", (member, channel)=>{})
+        // bot.on("voiceChannelLeave", (member, channel)=>{})
 
         const commandTypes = fs.readdirSync(path.join(__dirname, "..", "commands"))
         let commands = null
@@ -45,7 +47,7 @@ module.exports = {
 
                 console.log(`Should update command "${commandD.name}" ${update}`)
                 if (update) {
-                    // console.log(`Updated "${commandD.name}"`)
+                    console.log(`Updated "${commandD.name}"`)
                     await bot.createCommand(commandD)
                 } else {
                 }

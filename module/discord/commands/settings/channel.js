@@ -29,8 +29,8 @@ module.exports = {
 
     /**
      * 
-     * @param {eris.CommandInteraction} interaction 
-     * @param {client} bot 
+     * @param {eris.CommandInteraction} interaction
+     * @param {client} bot
      */
     async execute(interaction, bot) {
         const options = await optionsPraser(interaction.data.options)
