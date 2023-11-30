@@ -3,6 +3,19 @@ const path = require("path")
 const dbBuilder = require("@airplanegobrr/database")
 const { getVideoDurationInSeconds: duration } = require('get-video-duration')
 
+const config = require("../../config.json")
+const knex = require("knex")({
+    client: "mysql",
+    connection: {
+        ...config,
+        charset: 'utf8mb4',
+        collate: 'utf8mb4_unicode_ci',
+        connTimeout: 10000,
+        query_timeout: 10000,
+        requestTimeout: 10000
+    },
+    useNullAsDefault: true
+})
 
 const mainDataPath = path.join(__dirname, "..", "..", "data")
 
