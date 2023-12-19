@@ -1,17 +1,17 @@
-const eris = require("eris");
+const dysnomia = require("@projectdysnomia/dysnomia");;
 const client = require("../../helpers/clientBuilder")
 
 module.exports = {
     name: "interactionCreate",
     /**
      * 
-     * @param {eris.Interaction} interaction
+     * @param {dysnomia.Interaction} interaction
      * @param {client} bot 
      */
     async execute(interaction, bot){
         if (!bot.loadedCommands) return interaction.createMessage({ content: "Bot starting...", flags: 64 })
         // console.log(interaction)
-        if (interaction instanceof eris.CommandInteraction) {
+        if (interaction instanceof dysnomia.CommandInteraction) {
             let commandName = interaction.data.name
             let command = bot.loadedCommands.get(commandName)
             if (command) {

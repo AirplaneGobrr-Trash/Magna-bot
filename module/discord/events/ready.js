@@ -1,4 +1,4 @@
-const eris = require("eris");
+const dysnomia = require("@projectdysnomia/dysnomia");;
 const path = require("path");
 const fs = require("fs")
 const utils = require("../../helpers/utils")

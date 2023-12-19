@@ -14,7 +14,7 @@ const Client = require("./clientBuilder")
 const { BroadcastChannel } = require("worker_threads")
 
 const { spotify } = require("../../config.json");
-const Eris = require('eris');
+const dysnomia = require('@projectdysnomia/dysnomia');
 
 const spotifyApi = new SpotifyWebApi({
     clientId: spotify.clientID,
@@ -103,7 +103,7 @@ class spotifyC {
 class music {
     /**
      * 
-     * @param {Eris.Client} bot 
+     * @param {dysnomia.Client} bot 
      */
     constructor(bot) {
         this.spotify = new spotifyC()
@@ -396,7 +396,7 @@ class music {
      * @param {*} guildID
      * @param {*} channelID
      * @param {Client} _bot
-     * @param {Eris.CommandInteraction} _interaction
+     * @param {dysnomia.CommandInteraction} _interaction
      */
     async add(song, guildID, channelID, _bot, _interaction, _shutUp = false) {
         if (song.includes("open.spotify.com")) {

@@ -110,4 +110,8 @@ database.json
 old
 data/*
 config.json
+
+# Locks
 pnpm-lock.yaml
+bun.lockb
+package-lock.json

@@ -1,6 +1,6 @@
 const { discord: dataHelper } = require("./dataHelper")
 const client = require("./clientBuilder")
-const eris = require("eris")
+const dysnomia = require("@projectdysnomia/dysnomia");
 const path = require("path")
 const fs = require("fs")
 
@@ -145,7 +145,7 @@ async function bCheck(client) {
 
 /**
  * 
- * @param {import("eris").InteractionDataOptions} interactionData 
+ * @param {import("dysnomia").InteractionDataOptions} interactionData 
  * @returns 
  */
 async function optionsPraser(interactionData){
@@ -153,11 +153,11 @@ async function optionsPraser(interactionData){
     // console.log("run",interactionData)
     for (var option of interactionData) {
         // options[opt.name] = opt.value ?? opt
-        if (option.type === eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND_GROUP) {
+        if (option.type === dysnomia.Constants.ApplicationCommandOptionTypes.SUB_COMMAND_GROUP) {
             // console.log("subGroup", __bName, option.name, option.options)
             options[option.name] = await optionsPraser(option.options)
 
-        } else if (option.type === eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND) {
+        } else if (option.type === dysnomia.Constants.ApplicationCommandOptionTypes.SUB_COMMAND) {
             // console.log("sub command", __bName, option.name, option.options)
             options[option.name] = await optionsPraser(option.options)
 
@@ -178,9 +178,9 @@ async function sleep(ms){
 
 /**
  * 
- * @param {eris.Member} member
- * @param {eris.VoiceChannel} channel
- * @param {eris.Client} bot
+ * @param {dysnomia.Member} member
+ * @param {dysnomia.VoiceChannel} channel
+ * @param {dysnomia.Client} bot
  */
 async function checkIfBitrateChange(member, channel, bot) {
     const nonBots = channel?.voiceMembers?.filter(mem => mem.bot == false).length

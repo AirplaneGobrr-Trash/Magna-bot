@@ -1,4 +1,4 @@
-const eris = require("eris");
+const dysnomia = require("@projectdysnomia/dysnomia");;
 const utils = require("../../helpers/utils")
 const client = require("../../helpers/clientBuilder")
 
@@ -6,9 +6,9 @@ module.exports = {
     name: "voiceChannelJoin",
     /**
      * 
-     * @param {eris.Member} member
-     * @param {eris.VoiceChannel} channel
-     * @param {eris.Client} bot
+     * @param {dysnomia.Member} member
+     * @param {dysnomia.VoiceChannel} channel
+     * @param {dysnomia.Client} bot
      */
     async execute(member, channel, bot){
         utils.discord.checkIfBitrateChange(member, channel, bot)

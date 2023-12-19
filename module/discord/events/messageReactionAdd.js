@@ -1,4 +1,4 @@
-const eris = require("eris");
+const dysnomia = require("@projectdysnomia/dysnomia");;
 const sokoban = require("../../helpers/games/sokoban")
 const { discord: dataHelper } = require("../../helpers/dataHelper")
 const client = require("../../helpers/clientBuilder")
@@ -7,9 +7,9 @@ module.exports = {
     name: "messageReactionAdd",
     /**
      * 
-     * @param {eris.Message} msg 
-     * @param {eris.Emoji} emoji 
-     * @param {eris.User} user 
+     * @param {dysnomia.Message} msg 
+     * @param {dysnomia.Emoji} emoji 
+     * @param {dysnomia.User} user 
      * @param {client} bot 
      */
     async execute(msg, emoji, user, bot) {

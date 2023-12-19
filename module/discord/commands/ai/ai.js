@@ -1,10 +1,10 @@
-const eris = require("eris");
+const dysnomia = require("@projectdysnomia/dysnomia");
 const client = require("../../../helpers/clientBuilder")
 const { discord: { optionsPraser }, sleep } = require("../../../helpers/utils") // JS moment
 
 const axios = require("axios").default
 
-const Constants = eris.Constants;
+const Constants = dysnomia.Constants;
 
 module.exports = {
     alwaysUpdate: true,
@@ -96,13 +96,13 @@ module.exports = {
 
     /**
      * 
-     * @param {eris.CommandInteraction} interaction 
+     * @param {dysnomia.CommandInteraction} interaction 
      * @param {client} bot 
      */
     async execute(interaction, bot) {
         const options = await optionsPraser(interaction.data.options)
         const command = Object.keys(options)[0]
-
+        
         switch (command) {
             case "texttoimage": {
                 try {

@@ -1,7 +1,7 @@
-const eris = require("eris")
+const dysnomia = require("@projectdysnomia/dysnomia");
 const music = require("./music")
 
-class e extends eris.Client {
+class e extends dysnomia.Client {
     constructor(token, options = {}) {
         super(token, options)
         this.music = new music(this)

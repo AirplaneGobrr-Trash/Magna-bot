@@ -2,7 +2,7 @@ require("../helpers/processUpdater")
 
 const { discord: config } = require("../../config.json")
 const Client = require("../helpers/clientBuilder")
-// const { Client } = require("eris")
+// const { Client } = require("@projectdysnomia/dysnomia");
 const bot = new Client(config.token, {
     intents: ["all"]
 })

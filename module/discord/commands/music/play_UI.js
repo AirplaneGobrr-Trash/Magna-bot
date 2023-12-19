@@ -1,9 +1,9 @@
-const eris = require("eris");
+const dysnomia = require("@projectdysnomia/dysnomia");;
 const client = require("../../../helpers/clientBuilder")
 const { discord: { optionsPraser } } = require("../../../helpers/utils");
 const dataHelper = require("../../../helpers/dataHelper");
 
-const Constants = eris.Constants;
+const Constants = dysnomia.Constants;
 
 module.exports = {
     alwaysUpdate: true,
@@ -13,7 +13,7 @@ module.exports = {
     },
     /**
      * 
-     * @param {eris.CommandInteraction} interaction 
+     * @param {dysnomia.CommandInteraction} interaction 
      * @param {client} bot 
      */
     async execute(interaction, bot) {
