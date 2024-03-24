@@ -36,7 +36,11 @@ module.exports = {
             for (var commandFile of commandFiles) {
                 const commandData = require(`../commands/${commandType}/${commandFile}`)
                 let commandD = commandData.command
-                if (typeof(commandD) === "function") commandD = await commandD()
+                try {
+                    if (typeof(commandD) === "function") commandD = await commandD()
+                } catch (e){
+                    console.log(`Error running "${commandFile}"`)
+                }
 
                 loadedCommands.set(commandD.name, commandData)
 

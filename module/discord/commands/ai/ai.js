@@ -9,19 +9,24 @@ const Constants = eris.Constants;
 module.exports = {
     alwaysUpdate: true,
     command: async () => {
-        var response = await axios.get("http://192.168.4.50:3504/api/models")
-        var models = {}
-        var data = {"TextToImageModels":["xyn-ai/anything-v4.0","gsdf/Counterfeit-V2.5","gsdf/Replicant","katakana/2D-Mix","prompthero/openjourney","runwayml/stable-diffusion-v1-5","hakurei/waifu-diffusion","johnslegers/epic-diffusion","stabilityai/stable-diffusion-2-1","22h/vintedois-diffusion-v0-1","Kilgori/inisanium-model"]}
+        let models = {}
+        try {
+            // let response = await axios.get("http://192.168.4.50:3504/api/models")
+        
+            let data = {"TextToImageModels":["xyn-ai/anything-v4.0","gsdf/Counterfeit-V2.5","gsdf/Replicant","katakana/2D-Mix","prompthero/openjourney","runwayml/stable-diffusion-v1-5","hakurei/waifu-diffusion","johnslegers/epic-diffusion","stabilityai/stable-diffusion-2-1","22h/vintedois-diffusion-v0-1","Kilgori/inisanium-model"]}
 
-        for (var modelType in data){
+        for (let modelType in data){
             models[modelType] = []
-            for (var model of data[modelType]) {
+            for (let model of data[modelType]) {
                 models[modelType].push({
                     name: model,
                     value: model
                 })
             }
         }
+    } catch (e){
+        console.log("Error loading models")
+    }
     return {
         name: "ai",
         description: "AI stuff",
