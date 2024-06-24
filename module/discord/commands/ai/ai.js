@@ -112,10 +112,10 @@ module.exports = {
             case "texttoimage": {
                 try {
                     if (!!options[command].private) await interaction.createMessage({content: "Thinking...", flags: 64}); else await interaction.createMessage("Thinking...");
-                    var steps = options[command].steps ?? 50
-                    var imgs = options[command].images ?? 1
-                    if (steps > 50 && interaction.member.id != "250029754076495874") steps = 50
-                    if (imgs > 1 && interaction.member.id != "250029754076495874") imgs = 1
+                    let steps = options[command].steps ?? 50
+                    let imgs = options[command].images ?? 1
+                    if (steps > 100) steps = 50
+                    if (imgs > 10 ) imgs = 1
                     const response = await axios.post("http://10.0.0.5:3504/api/create", {
                         prompt: options[command].prompt,
                         negprompt: "EasyNegative",
