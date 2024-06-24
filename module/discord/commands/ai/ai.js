@@ -11,7 +11,7 @@ module.exports = {
     command: async () => {
         let models = {}
         try {
-            // let response = await axios.get("http://192.168.4.50:3504/api/models")
+            // let response = await axios.get("http://10.0.0.5:3504/api/models")
         
             let data = {"TextToImageModels":["xyn-ai/anything-v4.0","gsdf/Counterfeit-V2.5","gsdf/Replicant","katakana/2D-Mix","prompthero/openjourney","runwayml/stable-diffusion-v1-5","hakurei/waifu-diffusion","johnslegers/epic-diffusion","stabilityai/stable-diffusion-2-1","22h/vintedois-diffusion-v0-1","Kilgori/inisanium-model"]}
 
@@ -75,7 +75,7 @@ module.exports = {
 },
 
     async loop(interaction, jobID, imageCount){
-        const statusResponse = await axios.post("http://192.168.4.50:3504/api/status", {
+        const statusResponse = await axios.post("http://10.0.0.5:3504/api/status", {
             type: 0,
             jobID: jobID
         })
@@ -84,7 +84,7 @@ module.exports = {
         if (data.status == 3) {
             var files = []
             for (let index = 0; index < imageCount; index++) {
-                const response = await axios.get(`http://192.168.4.50:3504/image/${jobID}/${index}`, {responseType: "arraybuffer"})
+                const response = await axios.get(`http://10.0.0.5:3504/image/${jobID}/${index}`, {responseType: "arraybuffer"})
                 // console.log(response.data)
                 let img = Buffer.from(response.data, "binary")
                 files.push({ file: img, name: `${index}.ai.airplanegobrr.xyz.png`})
@@ -116,7 +116,7 @@ module.exports = {
                     var imgs = options[command].images ?? 1
                     if (steps > 50 && interaction.member.id != "250029754076495874") steps = 50
                     if (imgs > 1 && interaction.member.id != "250029754076495874") imgs = 1
-                    const response = await axios.post("http://192.168.4.50:3504/api/create", {
+                    const response = await axios.post("http://10.0.0.5:3504/api/create", {
                         prompt: options[command].prompt,
                         negprompt: "EasyNegative",
                         model: options[command].model,
