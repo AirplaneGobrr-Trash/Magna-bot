@@ -177,7 +177,7 @@ class music {
                                 }).then(async (response) => {
 
                                 }).catch(async (error) => {
-                                    console.log(error.config, error.code)
+                                    console.log(error.config, error.code, error.request)
                                     if (error?.code == "ERR_CANCELED") {
                                         console.log(error.request._currentUrl)
                                         vc.play(error.request._currentUrl, {
@@ -198,8 +198,23 @@ class music {
                                 console.log("Starting to play", songPath, song)
                                 vc.play(path.join(songPath, "audio.mp3"), { inlineVolume: true })
 
-                                var { title } = require(path.join(songPath, "data.json"))
-                                await bot.createMessage(textChannelID, `Now playing ${"`"}${title}${"`"}`)
+                                var { title, videoId, author } = require(path.join(songPath, "data.json"))
+                                // await bot.createMessage(textChannelID, `Now playing ${"`"}${title}${"`"}`)
+                                await bot.createMessage(textChannelID, {
+                                    embed: {
+                                        title: `Now playing ${"`"}${title}${"`"}`,
+                                        url: `https://www.youtube.com/watch?v=${videoId}`,
+                                        thumbnail: {
+                                            url: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+                                        },
+                                        author: {
+                                            name: author.user ?? author.name,
+                                            url: author.user_url ?? author.channel_url,
+                                            icon_url: author.thumbnails.pop().url ?? ""
+                                        }
+                                    }
+
+                                })
                             } else {
                                 console.log("Can't find file!")
                                 await bot.createMessage(textChannelID, `Can't find song file`)
