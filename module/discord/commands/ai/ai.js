@@ -7,6 +7,7 @@ const axios = require("axios").default
 const Constants = eris.Constants;
 
 let aiServer = "http://10.0.0.15:3504"
+let aiToken = "72e41fca-f10b-44f9-9cfc-9ade0bc370b5"
 
 module.exports = {
     alwaysUpdate: true,
@@ -127,7 +128,7 @@ module.exports = {
                         imgs: imgs,
                         width: 512,
                         height: 512,
-                        token: "72e41fca-f10b-44f9-9cfc-9ade0bc370b5"
+                        token: aiToken
                     })
                     let data = response.data
                     console.log(response.data)
